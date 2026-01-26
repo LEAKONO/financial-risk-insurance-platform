@@ -1,0 +1,172 @@
+const mongoose = require('mongoose');
+
+const documentSchema = new mongoose.Schema({
+  name: String,
+  url: String,
+  type: String,
+  uploadDate: {
+    type: Date,
+    default: Date.now
+  },
+  verified: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const claimSchema = new mongoose.Schema({
+  claimNumber: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  policy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Policy',
+    required: true
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  
+  // Claim Details
+  type: {
+    type: String,
+    enum: [
+      'accident', 'illness', 'property-damage', 'theft', 
+      'liability', 'disability', 'death', 'other'
+    ],
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  incidentDate: {
+    type: Date,
+    required: true
+  },
+  reportDate: {
+    type: Date,
+    default: Date.now
+  },
+  
+  // Financial Details
+  claimedAmount: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  approvedAmount: {
+    type: Number,
+    min: 0
+  },
+  paidAmount: {
+    type: Number,
+    min: 0,
+    default: 0
+  },
+  paymentDate: Date,
+  
+  // Supporting Documents
+  documents: [documentSchema],
+  
+  // Status Tracking
+  status: {
+    type: String,
+    enum: [
+      'submitted', 'under-review', 'documentation-required',
+      'approved', 'rejected', 'paid', 'closed'
+    ],
+    default: 'submitted'
+  },
+  statusHistory: [{
+    status: String,
+    changedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    changedAt: {
+      type: Date,
+      default: Date.now
+    },
+    notes: String
+  }],
+  
+  // Investigation
+  assignee: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  investigationNotes: String,
+  fraudIndicators: [{
+    indicator: String,
+    severity: {
+      type: String,
+      enum: ['low', 'medium', 'high']
+    },
+    description: String
+  }],
+  
+  // Rejection/Cancellation
+  rejectionReason: String,
+  rejectionDate: Date,
+  
+  // Audit
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  updatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
+}, {
+  timestamps: true
+});
+
+// Generate claim number before saving
+claimSchema.pre('save', async function(next) {
+  if (!this.isNew) return next();
+  
+  if (!this.claimNumber) {
+    const prefix = 'CLM';
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 9000 + 1000);
+    this.claimNumber = `${prefix}-${timestamp}-${random}`;
+  }
+  
+  // Add initial status to history
+  this.statusHistory = [{
+    status: this.status,
+    changedBy: this.createdBy,
+    notes: 'Claim submitted'
+  }];
+  
+  next();
+});
+
+// Update status history when status changes
+claimSchema.pre('save', function(next) {
+  if (this.isModified('status')) {
+    this.statusHistory.push({
+      status: this.status,
+      changedBy: this.updatedBy || this.createdBy,
+      notes: `Status changed to ${this.status}`
+    });
+  }
+  next();
+});
+
+// Indexes for performance
+claimSchema.index({ claimNumber: 1 });
+claimSchema.index({ user: 1 });
+claimSchema.index({ policy: 1 });
+claimSchema.index({ status: 1 });
+claimSchema.index({ incidentDate: 1 });
+claimSchema.index({ createdAt: 1 });
+
+module.exports = mongoose.model('Claim', claimSchema);

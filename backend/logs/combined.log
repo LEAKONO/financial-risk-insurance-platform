@@ -1,0 +1,17 @@
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:46"}
+{"level":"error","message":"SMTP connection error: Missing credentials for \"PLAIN\"","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:47"}
+{"level":"error","message":"Uncaught Exception: logger.info is not a function","service":"financial-risk-insurance","timestamp":"2026-01-26 23:53:41"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:34"}
+{"level":"error","message":"SMTP connection error: Missing credentials for \"PLAIN\"","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:35"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:42"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-26 23:59:30"}
