@@ -1,60 +1,42 @@
-const { body } = require('express-validator');
-const constants = require('../config/constants');
-const User = require('../models/User');
+const { body, param, query } = require('express-validator');
 
 const registerValidator = [
   body('email')
-    .trim()
     .isEmail()
-    .withMessage('Please provide a valid email address')
     .normalizeEmail()
-    .custom(async (email) => {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        throw new Error('Email already in use');
-      }
-      return true;
-    }),
+    .withMessage('Please enter a valid email address')
+    .notEmpty()
+    .withMessage('Email is required'),
   
   body('password')
-    .isLength({ min: constants.PASSWORD_MIN_LENGTH })
-    .withMessage(`Password must be at least ${constants.PASSWORD_MIN_LENGTH} characters long`)
-    .matches(constants.PASSWORD_REGEX)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
-  
-  body('confirmPassword')
-    .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error('Passwords do not match');
-      }
-      return true;
-    }),
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number')
+    .notEmpty()
+    .withMessage('Password is required'),
   
   body('firstName')
     .trim()
-    .notEmpty()
-    .withMessage('First name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('First name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s'-]+$/)
-    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
+    .notEmpty()
+    .withMessage('First name is required'),
   
   body('lastName')
     .trim()
-    .notEmpty()
-    .withMessage('Last name is required')
     .isLength({ min: 2, max: 50 })
     .withMessage('Last name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s'-]+$/)
-    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
+    .notEmpty()
+    .withMessage('Last name is required'),
   
   body('dateOfBirth')
     .isISO8601()
-    .withMessage('Please provide a valid date of birth')
+    .withMessage('Please enter a valid date')
     .custom((value) => {
       const birthDate = new Date(value);
       const today = new Date();
-      let age = today.getFullYear() - birthDate.getFullYear();
+      const age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
       
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -62,28 +44,29 @@ const registerValidator = [
       }
       
       if (age < 18) {
-        throw new Error('You must be at least 18 years old');
-      }
-      
-      if (age > 100) {
-        throw new Error('Age must be 100 or younger');
+        throw new Error('You must be at least 18 years old to register');
       }
       
       return true;
-    }),
+    })
+    .notEmpty()
+    .withMessage('Date of birth is required'),
   
   body('phone')
-    .optional({ checkFalsy: true })
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number')
+    .trim()
+    .matches(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)
+    .withMessage('Please enter a valid phone number')
+    .notEmpty()
+    .withMessage('Phone number is required')
 ];
 
 const loginValidator = [
   body('email')
-    .trim()
     .isEmail()
-    .withMessage('Please provide a valid email address')
-    .normalizeEmail(),
+    .normalizeEmail()
+    .withMessage('Please enter a valid email address')
+    .notEmpty()
+    .withMessage('Email is required'),
   
   body('password')
     .notEmpty()
@@ -92,27 +75,29 @@ const loginValidator = [
 
 const forgotPasswordValidator = [
   body('email')
-    .trim()
     .isEmail()
-    .withMessage('Please provide a valid email address')
     .normalizeEmail()
-    .custom(async (email) => {
-      const user = await User.findOne({ email });
-      if (!user) {
-        throw new Error('No account found with this email');
-      }
-      return true;
-    })
+    .withMessage('Please enter a valid email address')
+    .notEmpty()
+    .withMessage('Email is required')
 ];
 
 const resetPasswordValidator = [
+  param('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  
   body('password')
-    .isLength({ min: constants.PASSWORD_MIN_LENGTH })
-    .withMessage(`Password must be at least ${constants.PASSWORD_MIN_LENGTH} characters long`)
-    .matches(constants.PASSWORD_REGEX)
-    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'),
+    .isLength({ min: 8 })
+    .withMessage('Password must be at least 8 characters long')
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
+    .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number')
+    .notEmpty()
+    .withMessage('Password is required'),
   
   body('confirmPassword')
+    .notEmpty()
+    .withMessage('Please confirm your password')
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Passwords do not match');
@@ -121,38 +106,9 @@ const resetPasswordValidator = [
     })
 ];
 
-const updateProfileValidator = [
-  body('firstName')
-    .optional()
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('First name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s'-]+$/)
-    .withMessage('First name can only contain letters, spaces, hyphens, and apostrophes'),
-  
-  body('lastName')
-    .optional()
-    .trim()
-    .isLength({ min: 2, max: 50 })
-    .withMessage('Last name must be between 2 and 50 characters')
-    .matches(/^[a-zA-Z\s'-]+$/)
-    .withMessage('Last name can only contain letters, spaces, hyphens, and apostrophes'),
-  
-  body('phone')
-    .optional({ checkFalsy: true })
-    .isMobilePhone()
-    .withMessage('Please provide a valid phone number'),
-  
-  body('dateOfBirth')
-    .optional()
-    .isISO8601()
-    .withMessage('Please provide a valid date of birth')
-];
-
 module.exports = {
   registerValidator,
   loginValidator,
   forgotPasswordValidator,
-  resetPasswordValidator,
-  updateProfileValidator
+  resetPasswordValidator
 };

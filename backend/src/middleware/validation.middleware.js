@@ -8,13 +8,20 @@ const { validationResult } = require('express-validator');
 const validate = (validations) => {
   return async (req, res, next) => {
     try {
+      // Debug: Log what's being validated
+      console.log('Validation middleware called for:', req.path);
+      console.log('Validation rules count:', validations.length);
+      
       // Run all validations
-      await Promise.all(validations.map(validation => validation.run(req)));
+      for (const validation of validations) {
+        await validation.run(req);
+      }
       
       // Check for errors
       const errors = validationResult(req);
       
       if (errors.isEmpty()) {
+        console.log('Validation passed for:', req.path);
         return next();
       }
       
@@ -26,7 +33,6 @@ const validate = (validations) => {
         location: error.location
       }));
       
-      // Log validation errors (optional)
       console.warn('Validation failed:', {
         path: req.path,
         method: req.method,
@@ -42,6 +48,7 @@ const validate = (validations) => {
       
     } catch (error) {
       console.error('Validation middleware error:', error);
+      console.error('Error stack:', error.stack);
       return res.status(500).json({
         success: false,
         message: 'Validation error',
@@ -51,4 +58,4 @@ const validate = (validations) => {
   };
 };
 
-module.exports = validate; // Export as a single function
+module.exports = validate;

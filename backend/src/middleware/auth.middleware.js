@@ -21,7 +21,8 @@ const auth = async (req, res, next) => {
       });
     }
     
-    const user = await User.findById(decoded.id).select('-password');
+    const userId = decoded.id;
+    const user = await User.findById(userId);
     
     if (!user) {
       return res.status(401).json({
@@ -39,12 +40,29 @@ const auth = async (req, res, next) => {
     
     req.user = user;
     req.token = token;
+    
     next();
   } catch (error) {
+    console.error('Authentication middleware error:', error.message);
+    
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired'
+      });
+    }
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token'
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: 'Authentication failed',
-      error: error.message
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 };

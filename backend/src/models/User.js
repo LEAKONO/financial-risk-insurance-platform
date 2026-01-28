@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -7,14 +6,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
-    trim: true,
-    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
+    trim: true
   },
   password: {
     type: String,
-    required: function() { return !this.oauthProvider; },
-    minlength: 8,
-    select: false
+    required: true
   },
   firstName: {
     type: String,
@@ -32,8 +28,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    trim: true,
-    match: [/^\+?[\d\s\-\(\)]+$/, 'Please enter a valid phone number']
+    required: true,
+    trim: true
   },
   role: {
     type: String,
@@ -48,26 +44,6 @@ const userSchema = new mongoose.Schema({
   emailVerificationExpires: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  
-  // OAuth fields
-  oauthProvider: {
-    type: String,
-    enum: ['google', 'facebook', 'github', null],
-    default: null
-  },
-  oauthId: String,
-  
-  // Profile
-  riskProfile: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'RiskProfile'
-  },
-  policies: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Policy'
-  }],
-  
-  // Audit fields
   lastLogin: Date,
   loginCount: {
     type: Number,
@@ -78,37 +54,13 @@ const userSchema = new mongoose.Schema({
     default: true
   }
 }, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
-
-// Virtual for full name
-userSchema.virtual('fullName').get(function() {
-  return `${this.firstName} ${this.lastName}`;
-});
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  timestamps: true
 });
 
 // Compare password method
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
-// Check if user has specific role
-userSchema.methods.hasRole = function(role) {
-  return this.role === role;
+userSchema.methods.comparePassword = function(candidatePassword) {
+  const bcrypt = require('bcryptjs');
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);

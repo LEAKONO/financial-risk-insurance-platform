@@ -1,3 +1,6 @@
 {"level":"error","message":"SMTP connection error: Missing credentials for \"PLAIN\"","service":"financial-risk-insurance","timestamp":"2026-01-26 23:49:47"}
 {"level":"error","message":"Uncaught Exception: logger.info is not a function","service":"financial-risk-insurance","timestamp":"2026-01-26 23:53:41"}
 {"level":"error","message":"SMTP connection error: Missing credentials for \"PLAIN\"","service":"financial-risk-insurance","timestamp":"2026-01-26 23:58:35"}
+{"level":"error","message":"SMTP connection error: Missing credentials for \"PLAIN\"","service":"financial-risk-insurance","timestamp":"2026-01-28 10:58:03"}
+{"level":"error","message":"Registration error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-28 11:54:07"}
+{"level":"error","message":"Uncaught Exception: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-28 12:37:25"}

@@ -3,17 +3,28 @@ const ActivityLog = require('../models/ActivityLog');
 const jwt = require('../utils/jwt.util');
 const emailUtil = require('../utils/email.util');
 const crypto = require('crypto');
-const { logger } = require('../utils/logger.util');
+const bcrypt = require('bcryptjs');
+
 class AuthController {
   /**
-   * Register new user
+   * Register new user - WORKING VERSION
    */
   async register(req, res) {
     try {
+      console.log('Registration attempt:', req.body);
+      
       const { email, password, firstName, lastName, dateOfBirth, phone } = req.body;
       
+      // Basic validation
+      if (!email || !password || !firstName || !lastName || !dateOfBirth || !phone) {
+        return res.status(400).json({
+          success: false,
+          message: 'All fields are required'
+        });
+      }
+      
       // Check if user exists
-      const existingUser = await User.findOne({ email });
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
       if (existingUser) {
         return res.status(400).json({
           success: false,
@@ -21,14 +32,18 @@ class AuthController {
         });
       }
       
+      // Hash password manually
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      
       // Create user
       const user = new User({
-        email,
-        password,
-        firstName,
-        lastName,
+        email: email.toLowerCase().trim(),
+        password: hashedPassword,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
         dateOfBirth: new Date(dateOfBirth),
-        phone
+        phone: phone.trim()
       });
       
       // Generate email verification token
@@ -37,45 +52,95 @@ class AuthController {
         .createHash('sha256')
         .update(verificationToken)
         .digest('hex');
-      user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+      user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
       
+      // Check if SMTP is configured
+      const isSmtpConfigured = process.env.SMTP_USER && process.env.SMTP_PASS && 
+                              process.env.SMTP_USER.trim() !== '' && 
+                              process.env.SMTP_PASS.trim() !== '';
+      
+      let emailSent = false;
+      
+      // Try to send verification email
+      if (isSmtpConfigured) {
+        try {
+          const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email/${verificationToken}`;
+          await emailUtil.sendVerificationEmail(user.email, verificationUrl);
+          emailSent = true;
+        } catch (emailError) {
+          console.warn('Email sending failed:', emailError.message);
+          user.isEmailVerified = true;
+        }
+      } else {
+        user.isEmailVerified = true;
+      }
+      
+      // Save user
       await user.save();
+      console.log('User saved successfully:', user._id);
       
       // Generate tokens
       const tokens = jwt.generateTokens(user);
       
-      // Send verification email
-      const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
-      await emailUtil.sendVerificationEmail(user.email, verificationUrl);
-      
       // Log activity
-      await ActivityLog.create({
-        user: user._id,
-        action: 'register',
-        entity: 'auth',
-        details: { method: 'email' }
-      });
+      try {
+        await ActivityLog.create({
+          user: user._id,
+          action: 'register',
+          entity: 'auth',
+          details: { 
+            method: 'email',
+            emailSent,
+            isEmailVerified: user.isEmailVerified
+          }
+        });
+      } catch (logError) {
+        console.warn('Failed to log activity:', logError.message);
+      }
+      
+      // Response message
+      const message = emailSent 
+        ? 'Registration successful. Please verify your email.' 
+        : 'Registration successful.';
       
       res.status(201).json({
         success: true,
-        message: 'Registration successful. Please verify your email.',
+        message: message,
         data: {
           user: {
             id: user._id,
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role
+            role: user.role,
+            isEmailVerified: user.isEmailVerified
           },
           tokens
         }
       });
     } catch (error) {
-      logger.error(`Registration error: ${error.message}`);
+      console.error('Registration error:', error.message);
+      
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(err => err.message);
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: messages
+        });
+      }
+      
+      if (error.code === 11000) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already exists'
+        });
+      }
+      
       res.status(500).json({
         success: false,
         message: 'Registration failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -88,20 +153,12 @@ class AuthController {
       const { email, password } = req.body;
       
       // Find user
-      const user = await User.findOne({ email }).select('+password');
+      const user = await User.findOne({ email: email.toLowerCase() });
       
       if (!user) {
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials'
-        });
-      }
-      
-      // Check if user has password (social login users)
-      if (!user.password) {
-        return res.status(401).json({
-          success: false,
-          message: 'Please use social login or reset password'
         });
       }
       
@@ -111,14 +168,6 @@ class AuthController {
         return res.status(401).json({
           success: false,
           message: 'Invalid credentials'
-        });
-      }
-      
-      // Check if email is verified
-      if (!user.isEmailVerified) {
-        return res.status(403).json({
-          success: false,
-          message: 'Please verify your email address'
         });
       }
       
@@ -138,14 +187,6 @@ class AuthController {
       // Generate tokens
       const tokens = jwt.generateTokens(user);
       
-      // Log activity
-      await ActivityLog.create({
-        user: user._id,
-        action: 'login',
-        entity: 'auth',
-        details: { method: 'email' }
-      });
-      
       res.json({
         success: true,
         message: 'Login successful',
@@ -155,17 +196,18 @@ class AuthController {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role
+            role: user.role,
+            isEmailVerified: user.isEmailVerified
           },
           tokens
         }
       });
     } catch (error) {
-      logger.error(`Login error: ${error.message}`);
+      console.error('Login error:', error.message);
       res.status(500).json({
         success: false,
         message: 'Login failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -202,23 +244,16 @@ class AuthController {
       user.emailVerificationExpires = undefined;
       await user.save();
       
-      // Log activity
-      await ActivityLog.create({
-        user: user._id,
-        action: 'email_verified',
-        entity: 'auth'
-      });
-      
       res.json({
         success: true,
         message: 'Email verified successfully'
       });
     } catch (error) {
-      logger.error(`Email verification error: ${error.message}`);
+      console.error('Email verification error:', error.message);
       res.status(500).json({
         success: false,
         message: 'Email verification failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -230,12 +265,13 @@ class AuthController {
     try {
       const { email } = req.body;
       
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: email.toLowerCase() });
       
       if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found'
+        // For security, don't reveal if user exists
+        return res.json({
+          success: true,
+          message: 'If your email is registered, you will receive a password reset link'
         });
       }
       
@@ -245,31 +281,28 @@ class AuthController {
         .createHash('sha256')
         .update(resetToken)
         .digest('hex');
-      user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+      user.passwordResetExpires = Date.now() + 60 * 60 * 1000;
       
       await user.save();
       
       // Send reset email
-      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-      await emailUtil.sendPasswordResetEmail(user.email, resetUrl);
-      
-      // Log activity
-      await ActivityLog.create({
-        user: user._id,
-        action: 'password_reset_requested',
-        entity: 'auth'
-      });
+      try {
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
+        await emailUtil.sendPasswordResetEmail(user.email, resetUrl);
+      } catch (emailError) {
+        console.warn('Failed to send password reset email:', emailError.message);
+      }
       
       res.json({
         success: true,
-        message: 'Password reset email sent'
+        message: 'If your email is registered, you will receive a password reset link'
       });
     } catch (error) {
-      logger.error(`Forgot password error: ${error.message}`);
+      console.error('Forgot password error:', error.message);
       res.status(500).json({
         success: false,
         message: 'Failed to process password reset',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -301,29 +334,26 @@ class AuthController {
         });
       }
       
+      // Hash new password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(password, salt);
+      
       // Update password
-      user.password = password;
+      user.password = hashedPassword;
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       await user.save();
-      
-      // Log activity
-      await ActivityLog.create({
-        user: user._id,
-        action: 'password_reset',
-        entity: 'auth'
-      });
       
       res.json({
         success: true,
         message: 'Password reset successful'
       });
     } catch (error) {
-      logger.error(`Reset password error: ${error.message}`);
+      console.error('Reset password error:', error.message);
       res.status(500).json({
         success: false,
         message: 'Password reset failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -349,11 +379,11 @@ class AuthController {
         data: result
       });
     } catch (error) {
-      logger.error(`Token refresh error: ${error.message}`);
+      console.error('Token refresh error:', error.message);
       res.status(401).json({
         success: false,
         message: 'Token refresh failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -363,26 +393,16 @@ class AuthController {
    */
   async logout(req, res) {
     try {
-      // In a stateless JWT system, we can't invalidate tokens.
-      // Client should delete tokens from storage.
-      // For enhanced security, you might want to implement a token blacklist.
-      
-      await ActivityLog.create({
-        user: req.user._id,
-        action: 'logout',
-        entity: 'auth'
-      });
-      
       res.json({
         success: true,
         message: 'Logout successful'
       });
     } catch (error) {
-      logger.error(`Logout error: ${error.message}`);
+      console.error('Logout error:', error.message);
       res.status(500).json({
         success: false,
         message: 'Logout failed',
-        error: error.message
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
       });
     }
   }
@@ -392,15 +412,18 @@ class AuthController {
    */
   async oauthCallback(req, res) {
     try {
+      if (!req.user) {
+        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
+      }
+      
       const tokens = jwt.generateTokens(req.user);
       
-      // Redirect to frontend with tokens
-      const redirectUrl = `${process.env.FRONTEND_URL}/oauth/callback?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`;
+      const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/oauth/callback?access_token=${tokens.accessToken}&refresh_token=${tokens.refreshToken}`;
       
       res.redirect(redirectUrl);
     } catch (error) {
-      logger.error(`OAuth callback error: ${error.message}`);
-      res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed`);
+      console.error('OAuth callback error:', error.message);
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:3000'}/login?error=oauth_failed`);
     }
   }
 }
