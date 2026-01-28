@@ -55,3 +55,31 @@
 {"level":"info","message":"✅ Verification email sent to leakonoemmanuel@gmail.com","service":"financial-risk-insurance","timestamp":"2026-01-28 19:41:48"}
 {"level":"debug","message":"Email ID: <ea221485-8014-89cb-7bf7-d26a0ba9c0bb@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-01-28 19:41:48"}
 {"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-28 19:49:05"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:27"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-28 19:50:28"}
+{"level":"error","message":"Get profile service error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:12:27"}
+{"level":"error","message":"Get profile controller error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:12:27"}
+{"level":"error","message":"Get user by ID controller error: Cast to ObjectId failed for value \"profile\" (type string) at path \"_id\" for model \"User\"","service":"financial-risk-insurance","timestamp":"2026-01-28 20:39:48"}
+{"level":"error","message":"Get user by ID controller error: Cast to ObjectId failed for value \"profile\" (type string) at path \"_id\" for model \"User\"","service":"financial-risk-insurance","timestamp":"2026-01-28 20:40:29"}
+{"level":"error","message":"Get profile service error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:43:46"}
+{"level":"error","message":"Get profile controller error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:43:46"}
+{"level":"error","message":"Get profile service error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:44:28"}
+{"level":"error","message":"Get profile controller error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:44:28"}
+{"level":"error","message":"Get profile service error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:51:22"}
+{"level":"error","message":"Get profile controller error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:51:22"}
+{"level":"error","message":"Get profile service error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:52:34"}
+{"level":"error","message":"Get profile controller error: Cannot populate path `riskProfile` because it is not in your schema. Set the `strictPopulate` option to false to override.","service":"financial-risk-insurance","timestamp":"2026-01-28 20:52:34"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-28 20:54:26"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:17"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-28 21:17:18"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-28 21:19:14"}

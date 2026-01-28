@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  riskProfile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'RiskProfile'
+  },
   role: {
     type: String,
     enum: ['customer', 'admin', 'underwriter'],
@@ -54,7 +58,8 @@ const userSchema = new mongoose.Schema({
     default: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  strictPopulate: false  // ✅ ADDED THIS LINE
 });
 
 // Compare password method

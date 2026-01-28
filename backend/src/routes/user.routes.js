@@ -3,7 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/user.controller');
 const auth = require('../middleware/auth.middleware');
 const { authorize } = require('../middleware/role.middleware');
-const validate = require('../middleware/validation.middleware'); // SINGLE IMPORT
+const validate = require('../middleware/validation.middleware');
 const { updateProfileValidator } = require('../validators/auth.validator');
 const { upload } = require('../config/cloudinary');
 const rateLimit = require('../middleware/rateLimit.middleware');
@@ -14,7 +14,7 @@ router.use(rateLimit.defaultLimiter);
 // All routes require authentication
 router.use(auth);
 
-// Profile routes
+// ✅ Profile routes (SPECIFIC ROUTES FIRST)
 router.get('/me', userController.getProfile);
 router.put('/profile', validate(updateProfileValidator), userController.updateProfile);
 router.post('/change-password', userController.changePassword);
@@ -27,7 +27,7 @@ router.get('/activity', userController.getActivityLog);
 // Account management
 router.delete('/account', userController.deleteAccount);
 
-// Admin-only routes
+// ✅ Admin-only routes (PARAMETERIZED ROUTES LAST)
 router.get('/', authorize('admin', 'underwriter'), userController.getUsers);
 router.get('/:id', authorize('admin', 'underwriter'), userController.getUserById);
 

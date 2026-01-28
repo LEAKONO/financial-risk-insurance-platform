@@ -1,25 +1,72 @@
 const User = require('../models/User');
 const AuthService = require('../services/auth.service');
-const AnalyticsService = require('../services/analytics.service');
 const ActivityLog = require('../models/ActivityLog');
 const { logger } = require('../utils/logger.util');
+
 class UserController {
   /**
-   * Get current user profile
+   * Get current user profile - SIMPLE VERSION
    */
   async getProfile(req, res) {
     try {
-      const user = await AuthService.getProfile(req.user._id);
+      // Use simple query instead of AuthService
+      const user = await User.findById(req.user._id)
+        .select('email firstName lastName role isEmailVerified phone dateOfBirth lastLogin createdAt');
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
       
       res.json({
         success: true,
-        data: user
+        data: { user }
       });
     } catch (error) {
       logger.error(`Get profile controller error: ${error.message}`);
-      res.status(error.message === 'User not found' ? 404 : 500).json({
+      res.status(500).json({
         success: false,
-        message: error.message
+        message: 'Failed to get user profile'
+      });
+    }
+  }
+   /**
+   * Get user dashboard data
+   */
+  async getDashboard(req, res) {
+    try {
+      // Get basic user info
+      const user = await User.findById(req.user._id)
+        .select('firstName lastName email role lastLogin createdAt');
+      
+      // Get user's policies count
+      const Policy = require('../models/Policy');
+      const policiesCount = await Policy.countDocuments({ user: req.user._id });
+      
+      // Get recent activities
+      const recentActivities = await ActivityLog.find({ user: req.user._id })
+        .sort({ timestamp: -1 })
+        .limit(5)
+        .lean();
+      
+      res.json({
+        success: true,
+        data: {
+          user,
+          stats: {
+            policies: policiesCount,
+            // Add more stats as needed
+          },
+          recentActivities
+        }
+      });
+    } catch (error) {
+      logger.error(`Get dashboard controller error: ${error.message}`);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to load dashboard'
       });
     }
   }
@@ -68,26 +115,6 @@ class UserController {
                 error.message === 'Current password is incorrect' ? 400 : 500).json({
         success: false,
         message: error.message
-      });
-    }
-  }
-  
-  /**
-   * Get user dashboard data
-   */
-  async getDashboard(req, res) {
-    try {
-      const dashboardData = await AnalyticsService.getUserDashboard(req.user._id);
-      
-      res.json({
-        success: true,
-        data: dashboardData
-      });
-    } catch (error) {
-      logger.error(`Get dashboard controller error: ${error.message}`);
-      res.status(500).json({
-        success: false,
-        message: 'Failed to load dashboard data'
       });
     }
   }
@@ -144,7 +171,6 @@ class UserController {
         });
       }
       
-      // Verify password
       const user = await User.findById(req.user._id).select('+password');
       const isPasswordValid = await user.comparePassword(password);
       
@@ -155,11 +181,9 @@ class UserController {
         });
       }
       
-      // Soft delete: deactivate account
       user.isActive = false;
       await user.save();
       
-      // Log activity
       await ActivityLog.create({
         user: req.user._id,
         action: 'account_deactivated',
@@ -192,9 +216,6 @@ class UserController {
         });
       }
       
-      // In a real implementation, you would save the file URL to user profile
-      // For now, we'll just return the file info
-      
       res.json({
         success: true,
         message: 'Profile picture uploaded successfully',
@@ -212,13 +233,12 @@ class UserController {
       });
     }
   }
-
+  
   /**
-   * Get all users (admin only) - ADD THIS METHOD
+   * Get all users (admin only)
    */
   async getUsers(req, res) {
     try {
-      // In a real implementation, you would fetch all users with proper pagination
       const users = await User.find({}).select('-password');
       
       res.json({
@@ -233,9 +253,9 @@ class UserController {
       });
     }
   }
-
+  
   /**
-   * Get user by ID (admin only) - ADD THIS METHOD
+   * Get user by ID (admin only)
    */
   async getUserById(req, res) {
     try {
@@ -257,6 +277,26 @@ class UserController {
       res.status(500).json({
         success: false,
         message: 'Failed to get user'
+      });
+    }
+  }
+  
+  /**
+   * TEMPORARY: Direct profile endpoint without service layer
+   */
+  async getProfileDirect(req, res) {
+    try {
+      const user = await User.findById(req.user._id)
+        .select('email firstName lastName role isEmailVerified phone');
+      
+      res.json({
+        success: true,
+        data: { user }
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Direct profile error'
       });
     }
   }

@@ -131,7 +131,8 @@ const riskProfileSchema = new mongoose.Schema({
     default: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  strictPopulate: false  // ✅ ADDED THIS LINE
 });
 
 // Index for faster queries

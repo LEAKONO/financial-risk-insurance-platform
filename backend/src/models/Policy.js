@@ -127,7 +127,8 @@ const policySchema = new mongoose.Schema({
   },
   renewalDate: Date
 }, {
-  timestamps: true
+  timestamps: true,
+  strictPopulate: false  // ✅ ADDED THIS LINE
 });
 
 // Generate policy number before saving
