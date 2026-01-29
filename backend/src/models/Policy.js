@@ -41,7 +41,6 @@ const premiumScheduleSchema = new mongoose.Schema({
 const policySchema = new mongoose.Schema({
   policyNumber: {
     type: String,
-    required: true,
     unique: true
   },
   user: {
@@ -84,11 +83,10 @@ const policySchema = new mongoose.Schema({
   },
   endDate: Date,
   termLength: {
-    type: Number, // in months
+    type: Number,
     required: true
   },
   
-  // Status
   status: {
     type: String,
     enum: ['draft', 'active', 'expired', 'cancelled', 'lapsed'],
@@ -128,18 +126,35 @@ const policySchema = new mongoose.Schema({
   renewalDate: Date
 }, {
   timestamps: true,
-  strictPopulate: false  // ✅ ADDED THIS LINE
+  strictPopulate: false
 });
 
-// Generate policy number before saving
-policySchema.pre('save', async function(next) {
-  if (!this.isNew) return next();
+// Generate policy number before saving - FIXED VERSION
+policySchema.pre('save', async function() {
+  console.log('=== PRE-SAVE HOOK START ===');
+  console.log('isNew:', this.isNew);
+  console.log('Current policyNumber:', this.policyNumber);
+  console.log('Current name:', this.name);
   
+  // Only generate for new documents
+  if (!this.isNew) {
+    console.log('Not a new document, skipping generation');
+    return;
+  }
+  
+  // Generate policy number if it doesn't exist
   if (!this.policyNumber) {
     const prefix = 'POL';
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.floor(Math.random() * 9000 + 1000);
     this.policyNumber = `${prefix}-${timestamp}-${random}`;
+    console.log('Generated policyNumber:', this.policyNumber);
+  }
+  
+  // Set default name if not provided
+  if (!this.name && this.coverage && this.coverage.length > 0 && this.coverage[0].type) {
+    this.name = `${this.coverage[0].type} Insurance Policy`;
+    console.log('Set default name:', this.name);
   }
   
   // Calculate end date if not provided
@@ -147,9 +162,11 @@ policySchema.pre('save', async function(next) {
     const endDate = new Date(this.startDate);
     endDate.setMonth(endDate.getMonth() + this.termLength);
     this.endDate = endDate;
+    console.log('Set end date:', this.endDate);
   }
   
-  next();
+  console.log('=== PRE-SAVE HOOK END ===');
+  // No need to call next() in async functions
 });
 
 // Indexes

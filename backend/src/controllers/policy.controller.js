@@ -5,12 +5,16 @@ const PremiumService = require('../services/premium.service');
 const emailUtil = require('../utils/email.util');
 const ActivityLog = require('../models/ActivityLog');
 const { logger } = require('../utils/logger.util');
+
 class PolicyController {
   /**
    * Create a new policy
    */
   async createPolicy(req, res) {
     try {
+      console.log('=== CREATE POLICY START ===');
+      console.log('Request body:', req.body);
+      
       const { 
         name, 
         description, 
@@ -21,8 +25,24 @@ class PolicyController {
         premiumFrequency 
       } = req.body;
       
+      // Validate required fields
+      if (!policyType) {
+        return res.status(400).json({
+          success: false,
+          message: 'policyType is required'
+        });
+      }
+      
+      if (!coverageAmount || coverageAmount <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'coverageAmount must be a positive number'
+        });
+      }
+      
       // Get user's risk profile
       const riskProfile = await RiskProfile.findOne({ user: req.user._id });
+      console.log('Risk profile found:', riskProfile ? 'Yes' : 'No');
       
       if (!riskProfile || !riskProfile.isComplete) {
         return res.status(400).json({
@@ -32,6 +52,7 @@ class PolicyController {
       }
       
       // Calculate premium
+      console.log('Calculating premiums...');
       const riskMultiplier = PremiumService.calculateRiskMultiplier(riskProfile);
       const basePremium = PremiumService.calculateBasePremium(policyType, coverageAmount);
       const totalPremium = PremiumService.calculateTotalPremium(policyType, coverageAmount, riskMultiplier);
@@ -40,12 +61,21 @@ class PolicyController {
         premiumFrequency || 'monthly'
       );
       
-      // Create policy
+      console.log('Premium calculations:', {
+        riskMultiplier,
+        basePremium,
+        totalPremium
+      });
+      
+      // Create policy with proper defaults
+      const policyName = name || `${policyType.charAt(0).toUpperCase() + policyType.slice(1)} Insurance Policy`;
+      console.log('Using policy name:', policyName);
+      
       const policy = new Policy({
         user: req.user._id,
         riskProfile: riskProfile._id,
-        name,
-        description,
+        name: policyName, // Use the default if not provided
+        description: description || `${policyType} insurance coverage`,
         coverage: coverage || [{ type: policyType, coverageAmount }],
         basePremium,
         totalPremium,
@@ -57,7 +87,14 @@ class PolicyController {
         status: 'active'
       });
       
+      console.log('Policy object before save:', {
+        name: policy.name,
+        policyNumber: policy.policyNumber,
+        coverage: policy.coverage
+      });
+      
       await policy.save();
+      console.log('Policy saved successfully with ID:', policy._id);
       
       // Update user's policies array
       await User.findByIdAndUpdate(req.user._id, {
@@ -83,16 +120,32 @@ class PolicyController {
         await emailUtil.sendPolicyCreationEmail(user.email, policy);
       }
       
+      console.log('=== CREATE POLICY SUCCESS ===');
+      
       res.status(201).json({
         success: true,
         message: 'Policy created successfully',
         data: policy
       });
     } catch (error) {
+      console.error('=== CREATE POLICY ERROR ===');
+      console.error('Error:', error.message);
+      console.error('Stack:', error.stack);
+      
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(err => err.message);
+        console.error('Validation errors:', messages);
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed: ' + messages.join(', ')
+        });
+      }
+      
       logger.error(`Create policy controller error: ${error.message}`);
       res.status(500).json({
         success: false,
-        message: 'Failed to create policy'
+        message: 'Failed to create policy',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
   }

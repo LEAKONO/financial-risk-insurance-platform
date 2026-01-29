@@ -22,6 +22,8 @@ const riskRoutes = require('./routes/risk.routes');
 const policyRoutes = require('./routes/policy.routes');
 const claimRoutes = require('./routes/claim.routes');
 const adminRoutes = require('./routes/admin.routes');
+const insuranceRoutes = require('./routes/insurance.routes');
+
 
 const app = express();
 
@@ -57,6 +59,8 @@ app.use('/api/risk', riskRoutes);
 app.use('/api/policies', policyRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/insurance', insuranceRoutes);
+
 
 // Health check
 app.get('/health', (req, res) => {
