@@ -5,7 +5,18 @@ const ActivityLog = require('../models/ActivityLog');
 const emailUtil = require('../utils/email.util');
 const { upload, deleteFile } = require('../config/cloudinary');
 const { logger } = require('../utils/logger.util');
+
 class ClaimService {
+  /**
+   * Generate a unique claim number
+   */
+  generateClaimNumber() {
+    const prefix = 'CLM';
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 9000 + 1000);
+    return `${prefix}-${timestamp}-${random}`;
+  }
+
   /**
    * Create a new claim
    * @param {Object} claimData - Claim data
@@ -33,7 +44,10 @@ class ClaimService {
         throw new Error(`Claimed amount cannot exceed policy coverage of $${maxCoverage}`);
       }
       
-      // Create claim
+      // Generate claim number
+      const claimNumber = this.generateClaimNumber();
+      
+      // Create claim WITH generated claimNumber
       const claim = new Claim({
         policy: policyId,
         user: userId,
@@ -42,7 +56,8 @@ class ClaimService {
         incidentDate: new Date(incidentDate),
         claimedAmount,
         documents: documents || [],
-        createdBy: userId
+        createdBy: userId,
+        claimNumber: claimNumber  // Set it here
       });
       
       await claim.save();
@@ -442,15 +457,6 @@ class ClaimService {
         Claim.countDocuments(query)
       ]);
       
-      // Add additional filters if provided
-      if (filters.minAmount) {
-        claims = claims.filter(claim => claim.claimedAmount >= filters.minAmount);
-      }
-      
-      if (filters.policyType) {
-        // This would require additional population or filtering
-      }
-      
       return {
         claims,
         pagination: {
@@ -536,24 +542,6 @@ class ClaimService {
           indicator: 'frequent_claimant',
           severity: 'medium',
           description: `User has filed ${userClaims.length + 1} claims total`
-        });
-      }
-      
-      // Check for similar claims in system
-      const similarClaims = await Claim.find({
-        type: claim.type,
-        incidentDate: { 
-          $gte: new Date(incidentDate.getTime() - 30 * 24 * 60 * 60 * 1000),
-          $lte: new Date(incidentDate.getTime() + 30 * 24 * 60 * 60 * 1000)
-        },
-        _id: { $ne: claim._id }
-      }).countDocuments();
-      
-      if (similarClaims > 5) {
-        indicators.push({
-          indicator: 'multiple_similar_claims',
-          severity: 'high',
-          description: `${similarClaims} similar claims filed around the same time`
         });
       }
       

@@ -4,28 +4,32 @@ class ClaimController {
   /**
    * Create a new claim
    */
-  async createClaim(req, res) {
-    try {
-      const claim = await ClaimService.createClaim(req.body, req.user._id);
-      
-      res.status(201).json({
-        success: true,
-        message: 'Claim submitted successfully',
-        data: claim
-      });
-    } catch (error) {
-      logger.error(`Create claim controller error: ${error.message}`);
-      
-      const status = error.message.includes('not found') ? 404 : 
-                    error.message.includes('not active') ? 400 :
-                    error.message.includes('exceed') ? 400 : 500;
-      
-      res.status(status).json({
-        success: false,
-        message: error.message
-      });
-    }
+  async createClaim(req, res, next) {
+  try {
+    const claim = await ClaimService.createClaim(req.body, req.user._id);
+    
+    res.status(201).json({
+      success: true,
+      message: 'Claim submitted successfully',
+      data: claim
+    });
+  } catch (error) {
+    logger.error(`Create claim controller error: ${error.message}`);
+    
+    // If you want to use next() for error handling
+    // next(error);
+    
+    // OR keep current error response
+    const status = error.message.includes('not found') ? 404 : 
+                  error.message.includes('not active') ? 400 :
+                  error.message.includes('exceed') ? 400 : 500;
+    
+    res.status(status).json({
+      success: false,
+      message: error.message
+    });
   }
+}
   
   /**
    * Get user's claims

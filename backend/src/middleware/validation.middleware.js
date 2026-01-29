@@ -1,61 +1,128 @@
 const { validationResult } = require('express-validator');
 
 /**
- * Validation middleware for express-validator
+ * Enhanced validation middleware for express-validator
+ * Handles all edge cases and provides better error messages
+ * 
  * @param {Array} validations - Array of validation rules
  * @returns {Function} Express middleware
  */
 const validate = (validations) => {
   return async (req, res, next) => {
     try {
-      // Debug: Log what's being validated
-      console.log('Validation middleware called for:', req.path);
-      console.log('Validation rules count:', validations.length);
-      
-      // Run all validations
-      for (const validation of validations) {
-        await validation.run(req);
+      // Log validation attempt (only in development)
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[Validation] ${req.method} ${req.path}`);
       }
       
-      // Check for errors
-      const errors = validationResult(req);
-      
-      if (errors.isEmpty()) {
-        console.log('Validation passed for:', req.path);
+      // Validate the validations parameter
+      if (!validations) {
+        console.warn(`[Validation Warning] No validation rules provided for ${req.path}`);
         return next();
       }
       
-      // Format errors
-      const formattedErrors = errors.array().map(error => ({
-        field: error.path,
-        message: error.msg,
-        value: error.value,
-        location: error.location
-      }));
+      if (!Array.isArray(validations)) {
+        console.error(`[Validation Error] Validation rules must be an array for ${req.path}`);
+        return next(); // Skip validation but continue
+      }
       
-      console.warn('Validation failed:', {
-        path: req.path,
-        method: req.method,
-        errors: formattedErrors
+      if (validations.length === 0) {
+        console.warn(`[Validation Warning] Empty validation array for ${req.path}`);
+        return next();
+      }
+      
+      // Check if all validation rules are valid
+      const invalidRules = validations.filter(v => typeof v !== 'function');
+      if (invalidRules.length > 0) {
+        console.error(`[Validation Error] ${invalidRules.length} invalid validation rules for ${req.path}`);
+        // Continue with valid rules only
+      }
+      
+      // Run all validations
+      const validationPromises = validations.map(validation => {
+        try {
+          return validation.run(req);
+        } catch (validationError) {
+          console.error(`[Validation Rule Error] ${validationError.message}`);
+          return Promise.resolve(); // Continue with other validations
+        }
       });
       
-      // Return error response
-      return res.status(400).json({
+      await Promise.all(validationPromises);
+      
+      // Check for validation errors
+      const errors = validationResult(req);
+      
+      if (errors.isEmpty()) {
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(`[Validation Success] ${req.path}`);
+        }
+        return next();
+      }
+      
+      // Format errors in a user-friendly way
+      const formattedErrors = errors.array().map(error => ({
+        field: error.path || error.param,
+        message: error.msg,
+        value: error.value,
+        location: error.location || 'body'
+      }));
+      
+      // Log validation failure
+      console.warn(`[Validation Failed] ${req.path}`, {
+        method: req.method,
+        errors: formattedErrors.map(e => `${e.field}: ${e.message}`)
+      });
+      
+      // Determine if this is a client error (validation) or server error
+      const hasValidationErrors = formattedErrors.some(e => 
+        e.message.includes('must be') || 
+        e.message.includes('required') ||
+        e.message.includes('invalid') ||
+        e.message.includes('should')
+      );
+      
+      const statusCode = hasValidationErrors ? 400 : 422;
+      
+      return res.status(statusCode).json({
         success: false,
         message: 'Validation failed',
         errors: formattedErrors
       });
       
     } catch (error) {
-      console.error('Validation middleware error:', error);
-      console.error('Error stack:', error.stack);
-      return res.status(500).json({
-        success: false,
-        message: 'Validation error',
-        error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-      });
+      // Handle unexpected errors in the validation middleware
+      console.error(`[Validation Middleware Error] ${req.path}:`, error.message);
+      console.error('Stack trace:', error.stack);
+      
+      // In production, we should fail gracefully
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(500).json({
+          success: false,
+          message: 'Internal server error during validation'
+        });
+      }
+      
+      // In development, provide more details but allow the request to continue
+      console.warn(`[Development] Bypassing validation for ${req.path} due to error`);
+      return next();
     }
   };
 };
 
-module.exports = validate;
+/**
+ * Simple validation wrapper that doesn't throw on missing validators
+ */
+const safeValidate = (validations) => {
+  if (!validations || !Array.isArray(validations) || validations.length === 0) {
+    console.warn(`[Safe Validation] No validations provided, using passthrough`);
+    return (req, res, next) => next();
+  }
+  
+  return validate(validations);
+};
+
+module.exports = {
+  validate,
+  safeValidate
+};

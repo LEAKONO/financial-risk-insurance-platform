@@ -38,3 +38,56 @@
 {"level":"error","message":"Change password service error: Current password is incorrect","service":"financial-risk-insurance","timestamp":"2026-01-29 16:03:09"}
 {"level":"error","message":"Change password controller error: Current password is incorrect","service":"financial-risk-insurance","timestamp":"2026-01-29 16:03:09"}
 {"level":"error","message":"Submit application controller error: ActivityLog validation failed: entityId: Cast to ObjectId failed for value \"APP-1769691794923-4hp4k479r\" (type string) at path \"entityId\" because of \"BSONError\", entity: `application` is not a valid enum value for path `entity`.","service":"financial-risk-insurance","timestamp":"2026-01-29 16:03:14"}
+{"level":"error","message":"Submit application controller error: ActivityLog validation failed: entityId: Cast to ObjectId failed for value \"APP-1769706447595-04jvx57cv\" (type string) at path \"entityId\" because of \"BSONError\", entity: `application` is not a valid enum value for path `entity`.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:07:27"}
+{"level":"error","message":"SyntaxError: Expected ',' or '}' after property value in JSON at position 193 (line 8 column 37)","service":"financial-risk-insurance","timestamp":"2026-01-29 20:10:36"}
+{"level":"error","message":"Stack: SyntaxError: Expected ',' or '}' after property value in JSON at position 193 (line 8 column 37)\n    at JSON.parse (<anonymous>)\n    at parse (/home/leakono/Projects/financial-risk-insurance/backend/node_modules/body-parser/lib/types/json.js:72:19)\n    at /home/leakono/Projects/financial-risk-insurance/backend/node_modules/body-parser/lib/read.js:162:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:214:14)\n    at invokeCallback (/home/leakono/Projects/financial-risk-insurance/backend/node_modules/raw-body/index.js:238:16)\n    at done (/home/leakono/Projects/financial-risk-insurance/backend/node_modules/raw-body/index.js:227:7)\n    at IncomingMessage.onEnd (/home/leakono/Projects/financial-risk-insurance/backend/node_modules/raw-body/index.js:287:7)\n    at IncomingMessage.emit (node:events:518:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","service":"financial-risk-insurance","timestamp":"2026-01-29 20:10:36"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:24:27"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:24:27"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 20:28:08"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:33:53"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:33:53"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 20:33:53"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:34:06"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:34:06"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 20:34:06"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:49:05"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:49:05"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 20:49:05"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:50:04"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 20:50:04"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 20:50:04"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:10"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:10"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:10"}
+{"level":"error","message":"Create claim error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:25"}
+{"level":"error","message":"Create claim controller error: Claim validation failed: claimNumber: Path `claimNumber` is required.","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:25"}
+{"level":"error","message":"Submit application controller error: Cannot read properties of undefined (reading 'notifyUnderwriters')","service":"financial-risk-insurance","timestamp":"2026-01-29 21:08:25"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:09:43"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:09:43"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:21:41"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:21:41"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:21:55"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:21:55"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:35:40"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:35:40"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:35:40"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:35:40"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:40:24"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:40:24"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:33"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}
+{"level":"error","message":"Process payment controller error: Cannot read properties of undefined (reading 'processWithPaymentGateway')","service":"financial-risk-insurance","timestamp":"2026-01-29 21:48:34"}

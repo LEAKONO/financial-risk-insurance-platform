@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const riskController = require('../controllers/risk.controller');
 const auth = require('../middleware/auth.middleware');
-const validate = require('../middleware/validation.middleware');const { riskProfileValidator, calculatePremiumValidator } = require('../validators/risk.validator');
+const { validate } = require('../middleware/validation.middleware');
+const { riskProfileValidator, calculatePremiumValidator } = require('../validators/risk.validator');
 const rateLimit = require('../middleware/rateLimit.middleware');
 
 // Apply rate limiting

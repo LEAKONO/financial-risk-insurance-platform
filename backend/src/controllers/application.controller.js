@@ -1,13 +1,12 @@
 const Policy = require('../models/Policy');
 const User = require('../models/User');
-const ActivityLog = require('../models/ActivityLog');
 const { logger } = require('../utils/logger.util');
 
 class ApplicationController {
   /**
    * Submit policy application
    */
-  async submitApplication(req, res) {
+  submitApplication = async (req, res) => {
     try {
       const {
         quoteId,
@@ -39,7 +38,7 @@ class ApplicationController {
         });
       }
 
-      // Create application record (in real app, you'd have an Application model)
+      // Create application record
       const application = {
         applicationId: `APP-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         userId: req.user._id,
@@ -65,21 +64,11 @@ class ApplicationController {
         riskProfileId: riskProfile._id
       };
 
-      // Log activity
-      await ActivityLog.create({
-        user: req.user._id,
-        action: 'application_submitted',
-        entity: 'application',
-        entityId: application.applicationId,
-        details: {
-          policyType,
-          coverageAmount,
-          applicationId: application.applicationId
-        }
-      });
+      // Log to console instead of ActivityLog
+      logger.info(`Application submitted: ${application.applicationId} by user ${req.user._id}`);
 
-      // Notify underwriters (in real app, send email/notification)
-      this.notifyUnderwriters(application);
+      // Notify underwriters
+      await this.notifyUnderwriters(application);
 
       res.status(201).json({
         success: true,
@@ -97,17 +86,18 @@ class ApplicationController {
       });
     } catch (error) {
       logger.error(`Submit application controller error: ${error.message}`);
+      logger.error(`Stack: ${error.stack}`);
       res.status(500).json({
         success: false,
         message: 'Failed to submit application'
       });
     }
-  }
+  };
 
   /**
    * Calculate premium (fallback if not provided in quote)
    */
-  calculatePremium(coverageAmount, policyType) {
+  calculatePremium = (coverageAmount, policyType) => {
     const rates = {
       life: 0.015,
       health: 0.02,
@@ -118,12 +108,12 @@ class ApplicationController {
     
     const rate = rates[policyType] || rates.life;
     return coverageAmount * rate * 20; // Default 20-year term
-  }
+  };
 
   /**
    * Notify underwriters about new application
    */
-  async notifyUnderwriters(application) {
+  notifyUnderwriters = async (application) => {
     try {
       // Find all underwriters and admins
       const underwriters = await User.find({
@@ -131,39 +121,26 @@ class ApplicationController {
         isActive: true
       }).select('email firstName lastName');
 
-      // In real app, send email or push notification
-      console.log(`Notifying ${underwriters.length} underwriters about application ${application.applicationId}`);
-      
       // Log notification
-      await ActivityLog.create({
-        user: application.userId,
-        action: 'underwriter_notified',
-        entity: 'application',
-        entityId: application.applicationId,
-        details: {
-          applicationId: application.applicationId,
-          notifiedCount: underwriters.length
-        }
-      });
+      logger.info(`Notifying ${underwriters.length} underwriters about application ${application.applicationId}`);
     } catch (error) {
       console.error('Failed to notify underwriters:', error.message);
     }
-  }
+  };
 
   /**
    * Get application status
    */
-  async getApplicationStatus(req, res) {
+  getApplicationStatus = async (req, res) => {
     try {
       const { applicationId } = req.params;
 
-      // In real app, fetch from Application model
-      // For now, return mock data
+      // Mock data
       const mockApplications = {
         'APP-123': {
           status: 'under_review',
-          submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-          estimatedCompletion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
+          submittedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          estimatedCompletion: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
           underwriterAssigned: 'John Smith',
           documentsRequired: ['Medical exam', 'Proof of income'],
           notes: 'Application is currently being reviewed by our underwriting team.'
@@ -201,14 +178,14 @@ class ApplicationController {
         message: 'Failed to get application status'
       });
     }
-  }
+  };
 
   /**
    * Get user's applications
    */
-  async getUserApplications(req, res) {
+  getUserApplications = async (req, res) => {
     try {
-      // In real app, fetch from Application model
+      // Mock data
       const mockApplications = [
         {
           applicationId: 'APP-123',
@@ -245,7 +222,7 @@ class ApplicationController {
         message: 'Failed to get applications'
       });
     }
-  }
+  };
 }
 
 module.exports = new ApplicationController();
