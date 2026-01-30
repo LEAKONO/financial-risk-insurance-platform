@@ -2,7 +2,7 @@ const { body } = require('express-validator');
 const Policy = require('../models/Policy');
 
 const createClaimValidator = [
-  body('policyId')
+  body('policy')  // CHANGED: from 'policyId' to 'policy'
     .notEmpty()
     .withMessage('Policy ID is required')
     .isMongoId()
@@ -14,8 +14,11 @@ const createClaimValidator = [
         throw new Error('Policy not found');
       }
       
-      if (policy.user.toString() !== req.user._id.toString()) {
-        throw new Error('You do not have access to this policy');
+      // For admin users, allow claims on any policy
+      if (req.user.role !== 'admin') {
+        if (policy.user.toString() !== req.user.id.toString()) {
+          throw new Error('You do not have access to this policy');
+        }
       }
       
       if (policy.status !== 'active') {

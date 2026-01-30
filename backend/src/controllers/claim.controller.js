@@ -1,35 +1,35 @@
 const ClaimService = require('../services/claim.service');
 const { logger } = require('../utils/logger.util');
+const Claim = require('../models/Claim');
+const Policy = require('../models/Policy');
+
 class ClaimController {
   /**
    * Create a new claim
    */
-  async createClaim(req, res, next) {
-  try {
-    const claim = await ClaimService.createClaim(req.body, req.user._id);
-    
-    res.status(201).json({
-      success: true,
-      message: 'Claim submitted successfully',
-      data: claim
-    });
-  } catch (error) {
-    logger.error(`Create claim controller error: ${error.message}`);
-    
-    // If you want to use next() for error handling
-    // next(error);
-    
-    // OR keep current error response
-    const status = error.message.includes('not found') ? 404 : 
-                  error.message.includes('not active') ? 400 :
-                  error.message.includes('exceed') ? 400 : 500;
-    
-    res.status(status).json({
-      success: false,
-      message: error.message
-    });
+  async createClaim(req, res) {
+    try {
+      const claim = await ClaimService.createClaim(req.body, req.user.id);
+      
+      res.status(201).json({
+        success: true,
+        message: 'Claim submitted successfully',
+        data: claim
+      });
+    } catch (error) {
+      logger.error(`Create claim controller error: ${error.message}`);
+      
+      const status = error.message.includes('not found') ? 404 : 
+                    error.message.includes('not active') ? 400 :
+                    error.message.includes('exceed') ? 400 :
+                    error.message.includes('not have access') ? 403 : 500;
+      
+      res.status(status).json({
+        success: false,
+        message: error.message
+      });
+    }
   }
-}
   
   /**
    * Get user's claims
@@ -38,7 +38,7 @@ class ClaimController {
     try {
       const { page, limit, status, sortBy, sortOrder } = req.query;
       
-      const result = await ClaimService.getUserClaims(req.user._id, {
+      const result = await ClaimService.getUserClaims(req.user.id, {
         page,
         limit,
         status,
@@ -64,7 +64,7 @@ class ClaimController {
    */
   async getClaimById(req, res) {
     try {
-      const claim = await ClaimService.getClaimById(req.params.id, req.user._id);
+      const claim = await ClaimService.getClaimById(req.params.id, req.user.id);
       
       res.json({
         success: true,
@@ -90,7 +90,7 @@ class ClaimController {
       const claim = await ClaimService.updateClaimStatus(
         req.params.id,
         req.body,
-        req.user._id
+        req.user.id
       );
       
       res.json({
@@ -120,7 +120,7 @@ class ClaimController {
       const claim = await ClaimService.assignClaim(
         req.params.id,
         req.body.assigneeId,
-        req.user._id
+        req.user.id
       );
       
       res.json({
@@ -156,7 +156,7 @@ class ClaimController {
       const document = await ClaimService.uploadDocument(
         req.file,
         req.params.id,
-        req.user._id
+        req.user.id
       );
       
       res.json({
@@ -185,7 +185,7 @@ class ClaimController {
       const result = await ClaimService.deleteDocument(
         req.params.id,
         req.params.documentId,
-        req.user._id
+        req.user.id
       );
       
       res.json({
@@ -231,7 +231,7 @@ class ClaimController {
    */
   async analyzeFraud(req, res) {
     try {
-      const claim = await ClaimService.getClaimById(req.params.id);
+      const claim = await ClaimService.getClaimById(req.params.id, req.user.id);
       
       if (!claim) {
         return res.status(404).json({

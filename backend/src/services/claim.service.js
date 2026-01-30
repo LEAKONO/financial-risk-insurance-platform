@@ -25,21 +25,43 @@ class ClaimService {
    */
   async createClaim(claimData, userId) {
     try {
-      const { policyId, type, description, incidentDate, claimedAmount, documents } = claimData;
+      // FIXED: Use 'policy' instead of 'policyId'
+      const { policy, type, description, incidentDate, claimedAmount, documents } = claimData;
       
-      // Verify policy exists and belongs to user
-      const policy = await Policy.findOne({
-        _id: policyId,
-        user: userId,
-        status: 'active'
+      // Debug logging
+      console.log('DEBUG - Creating claim:', {
+        policyId: policy,
+        userId,
+        claimData: { type, description, claimedAmount }
       });
       
-      if (!policy) {
-        throw new Error('Policy not found or not active');
+      // First check if policy exists
+      const policyDoc = await Policy.findById(policy);
+      
+      if (!policyDoc) {
+        throw new Error('Policy not found');
+      }
+      
+      // Check if policy is active
+      if (policyDoc.status !== 'active') {
+        throw new Error(`Policy is ${policyDoc.status}, must be active to file a claim`);
+      }
+      
+      // Check if user has access to policy
+      // For admin users, skip ownership check
+      const user = await User.findById(userId);
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      if (user.role !== 'admin') {
+        if (policyDoc.user.toString() !== userId.toString()) {
+          throw new Error('You do not have access to this policy');
+        }
       }
       
       // Check maximum coverage
-      const maxCoverage = policy.coverage.reduce((sum, cov) => sum + cov.coverageAmount, 0);
+      const maxCoverage = policyDoc.coverage.reduce((sum, cov) => sum + cov.coverageAmount, 0);
       if (claimedAmount > maxCoverage) {
         throw new Error(`Claimed amount cannot exceed policy coverage of $${maxCoverage}`);
       }
@@ -47,9 +69,9 @@ class ClaimService {
       // Generate claim number
       const claimNumber = this.generateClaimNumber();
       
-      // Create claim WITH generated claimNumber
+      // Create claim
       const claim = new Claim({
-        policy: policyId,
+        policy: policy,
         user: userId,
         type,
         description,
@@ -57,15 +79,15 @@ class ClaimService {
         claimedAmount,
         documents: documents || [],
         createdBy: userId,
-        claimNumber: claimNumber  // Set it here
+        claimNumber: claimNumber
       });
       
       await claim.save();
       
       // Update policy claim statistics
-      policy.totalClaims += 1;
-      policy.totalClaimAmount += claimedAmount;
-      await policy.save();
+      policyDoc.totalClaims += 1;
+      policyDoc.totalClaimAmount += claimedAmount;
+      await policyDoc.save();
       
       // Log activity
       await ActivityLog.create({
@@ -75,13 +97,12 @@ class ClaimService {
         entityId: claim._id,
         details: {
           claimNumber: claim.claimNumber,
-          policyNumber: policy.policyNumber,
+          policyNumber: policyDoc.policyNumber,
           claimedAmount
         }
       });
       
       // Send notification email
-      const user = await User.findById(userId);
       if (user && user.email) {
         await emailUtil.sendClaimStatusEmail(user.email, claim);
       }

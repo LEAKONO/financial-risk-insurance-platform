@@ -385,3 +385,102 @@
 {"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-29 21:51:59"}
 {"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-29 21:52:00"}
 {"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-29 21:54:54"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:45"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:47"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 12:20:51"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:38"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 12:21:42"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-30 12:28:23"}
+{"level":"info","message":"✅ Policy creation email sent to leakonoemmanuel@gmail.com for policy POL-303216-7081","service":"financial-risk-insurance","timestamp":"2026-01-30 12:28:27"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-30 12:29:00"}
+{"level":"info","message":"✅ Policy creation email sent to leakonoemmanuel@gmail.com for policy POL-341028-8897","service":"financial-risk-insurance","timestamp":"2026-01-30 12:29:04"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-30 12:34:18"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-30 12:34:42"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:46"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:56"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 12:40:57"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:37"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:44"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:46"}
+{"level":"error","message":"Create claim error: Policy not found or not active","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:54"}
+{"level":"error","message":"Create claim controller error: Policy not found or not active","service":"financial-risk-insurance","timestamp":"2026-01-30 12:44:54"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 12:58:25"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:22"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:23"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:23"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:23"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:23"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:23"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 12:59:24"}
+{"level":"error","message":"Create claim error: Policy not found or not active","service":"financial-risk-insurance","timestamp":"2026-01-30 13:01:36"}
+{"level":"error","message":"Create claim controller error: Policy not found or not active","service":"financial-risk-insurance","timestamp":"2026-01-30 13:01:36"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:13"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:21"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:23"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:30"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:12:30"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 13:28:28"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:10"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 13:42:12"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:06"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:14"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:15"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:39"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:44:39"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:38"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:45"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:46"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:46"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:46"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:46"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:46"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 13:51:47"}
+{"level":"error","message":"Create claim error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:52:14"}
+{"level":"error","message":"Create claim controller error: next is not a function","service":"financial-risk-insurance","timestamp":"2026-01-30 13:52:14"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 13:58:04"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:01"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 14:01:03"}
+{"level":"info","message":"✅ Claim status email sent to leakonoemmanuel@gmail.com for claim CLM-950046-4239","service":"financial-risk-insurance","timestamp":"2026-01-30 14:02:33"}
+{"level":"info","message":"✅ Claim status email sent to leakonoemmanuel@gmail.com for claim CLM-081135-2600","service":"financial-risk-insurance","timestamp":"2026-01-30 14:04:44"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-01-30 14:12:49"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 14:16:28"}
