@@ -492,3 +492,11 @@
 {"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-01-30 20:36:02"}
 {"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-01-30 20:36:06"}
 {"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-01-30 22:42:50"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:40"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-02 13:21:41"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-02 13:25:35"}
