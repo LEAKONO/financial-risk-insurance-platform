@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button/Button';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { ProgressBar } from '@/components/ui/Progress/ProgressBar';
 import { formatCurrency, formatPercentage, formatDate } from '@/utils/formatters';
-import { riskService } from '@/services/risk.service';
+import { riskService } from '@/services/api';
 
 export const RiskSummary = ({ onImprove, onGetCoverage, onViewDetails }) => {
   const [summary, setSummary] = useState(null);
@@ -564,4 +564,4 @@ export const RiskSummary = ({ onImprove, onGetCoverage, onViewDetails }) => {
       </Card>
     </motion.div>
   );
-};
+};export default RiskSummary;

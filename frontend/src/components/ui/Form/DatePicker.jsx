@@ -47,4 +47,5 @@ const DatePicker = ({
   )
 }
 
+export { DatePicker }
 export default DatePicker

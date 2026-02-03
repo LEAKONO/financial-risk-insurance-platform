@@ -366,4 +366,4 @@ export const CoverageSelector = ({ onSelect, selectedCoverage = [], onNext }) =>
       </div>
     </motion.div>
   );
-};
+};export default CoverageSelector;

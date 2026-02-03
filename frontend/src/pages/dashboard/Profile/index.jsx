@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  UserIcon,
+  User,
   EnvelopeIcon,
   PhoneIcon,
   CalendarIcon,
@@ -17,7 +17,7 @@ import {
 import Button from '../../../components/ui/Button/Button';
 import Input from '../../../components/ui/Form/Input';
 import Select from '../../../components/ui/Form/Select';
-import Switch from '../../../components/ui/Form/Switch';
+import Switch from '../../../components/ui/Form/Switch.jsx';
 import Modal from '../../../components/ui/Modal/Modal';
 
 const DashboardProfile = () => {
@@ -57,7 +57,7 @@ const DashboardProfile = () => {
   });
 
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: UserIcon },
+    { id: 'personal', label: 'Personal Info', icon: User },
     { id: 'security', label: 'Security', icon: LockClosedIcon },
     { id: 'notifications', label: 'Notifications', icon: BellIcon },
     { id: 'preferences', label: 'Preferences', icon: DevicePhoneMobileIcon }
@@ -116,7 +116,7 @@ const DashboardProfile = () => {
           {/* Profile Photo */}
           <div className="relative">
             <div className="w-32 h-32 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <UserIcon className="w-16 h-16" />
+              <User className="w-16 h-16" />
             </div>
             <button
               onClick={() => setIsUploadPhotoOpen(true)}
@@ -200,14 +200,14 @@ const DashboardProfile = () => {
                     value={profileData.firstName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
                     disabled={!isEditing}
-                    icon={UserIcon}
+                    icon={User}
                   />
                   <Input
                     label="Last Name"
                     value={profileData.lastName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
                     disabled={!isEditing}
-                    icon={UserIcon}
+                    icon={User}
                   />
                   <Input
                     label="Email Address"

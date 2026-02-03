@@ -727,4 +727,4 @@ export const UserDetails = ({ userId }) => {
       </div>
     </div>
   );
-};
+};export default UserDetails;

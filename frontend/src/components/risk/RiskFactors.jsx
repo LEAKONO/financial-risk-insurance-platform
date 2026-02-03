@@ -492,4 +492,4 @@ export const RiskFactors = ({ onFactorSelect, selectedFactors = [] }) => {
       </Card>
     </motion.div>
   );
-};
+};export default RiskFactors;

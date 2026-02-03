@@ -43,4 +43,5 @@ const Badge = ({
   )
 }
 
+export { Badge }
 export default Badge

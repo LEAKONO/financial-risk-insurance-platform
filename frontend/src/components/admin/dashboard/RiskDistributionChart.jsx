@@ -4,7 +4,7 @@ import {
   AlertTriangle, Shield, TrendingUp, Users,
   BarChart3, Filter, Download, RefreshCw
 } from 'lucide-react';
-import { adminService } from '../../../services/admin.service';
+import { adminService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
 import { DonutChart } from '../../charts/DonutChart';
 import { BarChart } from '../../charts/BarChart';

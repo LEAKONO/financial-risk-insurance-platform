@@ -5,11 +5,11 @@ import {
   Save, X, Plus, Trash2, Calendar, DollarSign,
   Users, Shield, FileText, AlertCircle, Clock
 } from 'lucide-react';
-import { policyService } from '../../../services/policy.service';
-import { userService } from '../../../services/user.service';
+import { policyService } from "../../../services/api";
+import { userService } from '../../../services/api';
 import { Loader, Toast } from '../../common';
-import { Button } from '../../../ui/Button';
-import { Input, Select, DatePicker } from '../../../ui/Form';
+import { Button } from '@/components/ui/Button';
+import { Input, Select, DatePicker } from '@/components/ui/Form';
 
 export const PolicyForm = ({ mode = 'create', policyId }) => {
   const { id } = useParams();

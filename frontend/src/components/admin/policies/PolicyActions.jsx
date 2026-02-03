@@ -5,9 +5,8 @@ import {
   CheckCircle, XCircle, Clock, Filter,
   MoreVertical, Copy, RefreshCw, Ban
 } from 'lucide-react';
-import { Button } from '../../../ui/Button';
-import { Toast } from '../../../common/Toast';
-
+import { Button } from '@/components/ui/Button';
+import Toast from "../../common/Toast";
 export const PolicyActions = ({ policy, onAction, disabled = false }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);

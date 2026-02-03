@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/Button/Button';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Progress } from '@/components/ui/Progress/Progress';
 import { useToast } from '@/hooks/useToast';
-import { claimService } from '@/services/claim.service';
+import { claimService } from '@/services/api';
 
 const statusConfig = {
   submitted: {
@@ -612,4 +612,4 @@ export const ClaimStatus = ({ claimId }) => {
       </div>
     </div>
   );
-};
+};export default ClaimStatus;

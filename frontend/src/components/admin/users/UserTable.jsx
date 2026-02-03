@@ -674,4 +674,4 @@ export const UserTable = ({ users: initialUsers = [], onAddUser, onEditUser, onD
       </div>
     </div>
   );
-};
+};export default UserTable;

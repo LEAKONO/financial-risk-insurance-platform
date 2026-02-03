@@ -6,25 +6,25 @@ import {
   CalculatorIcon,
   ShieldCheckIcon,
   ExclamationTriangleIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
+  ArrowTrendingUp,
+  ArrowTrendingDown,
   CheckCircleIcon,
   XCircleIcon,
   ArrowRightIcon,
   BoltIcon,
-  UserIcon,
+  User,
   BuildingOfficeIcon,
   HeartIcon,
   CreditCardIcon,
   MapPinIcon
 } from '@heroicons/react/24/outline';
-import RiskCalculator from '../../../components/risk/RiskCalculator';
-import RiskScore from '../../../components/risk/RiskScore';
-import RiskFactors from '../../../components/risk/RiskFactors';
-import RiskSummary from '../../../components/risk/RiskSummary';
-import Modal from '../../../components/ui/Modal/Modal';
-import Button from '../../../components/ui/Button/Button';
-import LineChart from '../../../components/charts/LineChart';
+import RiskCalculator from '@/components/risk/RiskCalculator';
+import RiskScore from '@/components/risk/RiskScore';
+import RiskFactors from '@/components/risk/RiskFactors';
+import RiskSummary from '@/components/risk/RiskSummary';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
+import { LineChart } from "@/components/charts/LineChart";
 
 const RiskAssessment = () => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
@@ -273,12 +273,12 @@ const RiskAssessment = () => {
             <div className="flex items-center space-x-2 text-sm">
               {riskScore < 65 ? (
                 <>
-                  <ArrowTrendingDownIcon className="w-5 h-5 text-green-500" />
+                  <ArrowTrendingDown className="w-5 h-5 text-green-500" />
                   <span className="text-green-600 dark:text-green-400">Improving</span>
                 </>
               ) : (
                 <>
-                  <ArrowTrendingUpIcon className="w-5 h-5 text-red-500" />
+                  <ArrowTrendingUp className="w-5 h-5 text-red-500" />
                   <span className="text-red-600 dark:text-red-400">Increasing</span>
                 </>
               )}
@@ -513,7 +513,7 @@ const RiskAssessment = () => {
         title="Calculate Your Risk Score"
         size="xl"
       >
-        <RiskCalculator onSubmit={handleCalculateRisk} />
+        <RiskCalculator onPremiumCalculated={handleCalculateRisk} />
       </Modal>
     </div>
   );

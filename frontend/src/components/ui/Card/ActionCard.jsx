@@ -47,4 +47,5 @@ const ActionCard = ({
   )
 }
 
+export { ActionCard }
 export default ActionCard

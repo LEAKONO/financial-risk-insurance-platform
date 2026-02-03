@@ -5,7 +5,7 @@ import {
   Download, Filter, Calendar, BarChart3,
   PieChart as PieChartIcon
 } from 'lucide-react';
-import { adminService } from '../../../services/admin.service';
+import { adminService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
 import { LineChart } from '../../charts/LineChart';
 import { BarChart } from '../../charts/BarChart';

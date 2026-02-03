@@ -383,4 +383,4 @@ export const UserActions = ({ user, onEdit, onDelete, onStatusChange }) => {
       </AnimatePresence>
     </>
   );
-};
+};export default UserActions;

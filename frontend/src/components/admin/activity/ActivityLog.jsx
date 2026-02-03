@@ -5,9 +5,9 @@ import {
   ChevronRight, AlertCircle, CheckCircle, XCircle,
   ExternalLink, Filter, RefreshCw 
 } from 'lucide-react';
-import { activityService } from '../../../services/activity.service';
+import { activityService } from "../../../services/api";
 import { Loader, Toast, Pagination } from '../../common';
-import { StatusBadge } from '../../ui/Badge';
+import { StatusBadge } from '@/components/ui/Badge';
 import { ActivityFilters } from './ActivityFilters';
 
 export const ActivityLog = () => {

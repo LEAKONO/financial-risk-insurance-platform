@@ -7,12 +7,12 @@ import {
   Download,
   Filter,
   Maximize2,
-  Minus2,
+  Minimize2,
   Info,
   AlertCircle
 } from 'lucide-react';
-import { Button } from '../../ui/Button/Button';
-import { Badge } from '../../ui/Badge/Badge';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { ChartTooltip } from './ChartTooltip';
 
 export const LineChart = ({
@@ -365,7 +365,7 @@ export const LineChart = ({
             onClick={handleZoomToggle}
             className="flex items-center space-x-1"
           >
-            {isZoomed ? <Minus2 size={16} /> : <Maximize2 size={16} />}
+            {isZoomed ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
             <span>{isZoomed ? 'Reset' : 'Zoom'}</span>
           </Button>
           

@@ -5,7 +5,7 @@ import {
   AlertCircle, CheckCircle, XCircle, MoreVertical,
   FileText, Users, TrendingUp
 } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge/Badge';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button/Button';
 import { formatDate, formatCurrency } from '@/utils/formatters';
 
@@ -202,4 +202,4 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
       </div>
     </motion.div>
   );
-};
+};export default PolicyCard;

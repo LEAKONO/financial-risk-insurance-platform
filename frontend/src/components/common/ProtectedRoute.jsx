@@ -27,4 +27,5 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children
 }
 
+export { ProtectedRoute }
 export default ProtectedRoute

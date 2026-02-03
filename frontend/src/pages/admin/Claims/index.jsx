@@ -4,7 +4,7 @@ import {
   MagnifyingGlassIcon,
   FunnelIcon,
   PlusIcon,
-  ClipboardListIcon,
+  ClipboardDocumentListIcon,
   CurrencyDollarIcon,
   ClockIcon,
   CheckCircleIcon,
@@ -222,7 +222,7 @@ const AdminClaims = () => {
             className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
           >
             <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
-              {index === 0 && <ClipboardListIcon className="w-6 h-6 text-white" />}
+              {index === 0 && <ClipboardDocumentListIcon className="w-6 h-6 text-white" />}
               {index === 1 && <ClockIcon className="w-6 h-6 text-white" />}
               {index === 2 && <CurrencyDollarIcon className="w-6 h-6 text-white" />}
               {index === 3 && <ExclamationTriangleIcon className="w-6 h-6 text-white" />}
@@ -357,7 +357,7 @@ const AdminClaims = () => {
           className="text-center py-12"
         >
           <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
-            <ClipboardListIcon className="w-12 h-12 text-gray-400" />
+            <ClipboardDocumentListIcon className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No claims found

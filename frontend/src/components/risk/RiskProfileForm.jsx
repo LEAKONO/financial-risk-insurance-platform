@@ -14,7 +14,7 @@ import { TextArea } from '@/components/ui/Form/TextArea';
 import { FileUpload } from '@/components/ui/Form/FileUpload';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { useToast } from '@/hooks/useToast';
-import { riskService } from '@/services/risk.service';
+import { riskService } from '@/services/api';
 
 const employmentOptions = [
   { value: 'employed', label: 'Employed' },
@@ -854,4 +854,4 @@ export const RiskProfileForm = ({ initialData = {}, onSubmit, onCancel }) => {
       </div>
     </motion.form>
   );
-};
+};export default RiskProfileForm;

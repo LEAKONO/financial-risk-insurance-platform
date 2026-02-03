@@ -6,7 +6,7 @@ import {
   HomeIcon, 
   UserGroupIcon, 
   DocumentTextIcon, 
-  ClipboardListIcon, 
+  ClipboardDocumentListIcon, 
   ChartBarIcon, 
   ChartPieIcon,
   Cog6ToothIcon,
@@ -26,7 +26,7 @@ const Sidebar = ({ isAdmin = false }) => {
   const userMenuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: HomeIcon },
     { path: '/dashboard/policies', label: 'My Policies', icon: DocumentTextIcon },
-    { path: '/dashboard/claims', label: 'My Claims', icon: ClipboardListIcon },
+    { path: '/dashboard/claims', label: 'My Claims', icon: ClipboardDocumentListIcon },
     { path: '/dashboard/profile', label: 'Profile', icon: UserGroupIcon },
   ];
 
@@ -34,7 +34,7 @@ const Sidebar = ({ isAdmin = false }) => {
     { path: '/admin', label: 'Dashboard', icon: ChartBarIcon },
     { path: '/admin/users', label: 'Users', icon: UserGroupIcon },
     { path: '/admin/policies', label: 'Policies', icon: DocumentTextIcon },
-    { path: '/admin/claims', label: 'Claims', icon: ClipboardListIcon },
+    { path: '/admin/claims', label: 'Claims', icon: ClipboardDocumentListIcon },
     { path: '/admin/activity', label: 'Activity Log', icon: ChartPieIcon },
     { path: '/admin/reports', label: 'Reports', icon: ChartBarIcon },
   ];

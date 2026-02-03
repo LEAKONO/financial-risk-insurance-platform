@@ -15,8 +15,8 @@ import { DatePicker } from '@/components/ui/Form/DatePicker';
 import { FileUpload } from '@/components/ui/Form/FileUpload';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { useToast } from '@/hooks/useToast';
-import { claimService } from '@/services/claim.service';
-import { policyService } from '@/services/policy.service';
+import { claimService } from '@/services/api';
+import { policyService } from '@/services/api';
 
 const claimTypes = [
   { value: 'accident', label: 'Accident', icon: AlertCircle },
@@ -859,4 +859,4 @@ Example:
       </div>
     </motion.form>
   );
-};
+};export default ClaimForm;

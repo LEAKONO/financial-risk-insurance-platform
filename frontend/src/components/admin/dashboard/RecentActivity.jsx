@@ -5,9 +5,9 @@ import {
   XCircle, AlertCircle, Clock, MoreVertical,
   ExternalLink, Filter, RefreshCw
 } from 'lucide-react';
-import { activityService } from '../../../services/activity.service';
+import { activityService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { StatusBadge } from '../../ui/Badge';
+import { StatusBadge } from '@/components/ui/Badge';
 
 export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = true }) => {
   const [activities, setActivities] = useState([]);

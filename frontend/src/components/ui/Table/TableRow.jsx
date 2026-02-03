@@ -22,4 +22,5 @@ const TableRow = ({
   )
 }
 
+export { TableRow }
 export default TableRow

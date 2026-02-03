@@ -78,4 +78,5 @@ const CircularProgress = ({
   )
 }
 
+export { CircularProgress }
 export default CircularProgress

@@ -38,4 +38,5 @@ const Radio = ({
   )
 }
 
+export { Radio }
 export default Radio

@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card/Card';
 import { Button } from '@/components/ui/Button/Button';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { formatCurrency, formatDate } from '@/utils/formatters';
-import { policyService } from '@/services/policy.service';
+import { policyService } from '@/services/api';
 
 export const PremiumBreakdown = ({ policyId, onPayment }) => {
   const [breakdown, setBreakdown] = useState(null);
@@ -447,4 +447,4 @@ export const PremiumBreakdown = ({ policyId, onPayment }) => {
       )}
     </motion.div>
   );
-};
+};export default PremiumBreakdown;

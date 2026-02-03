@@ -7,10 +7,10 @@ import {
   Download, Send, Edit, ExternalLink,
   ChevronLeft, CheckCircle, XCircle, Users
 } from 'lucide-react';
-import { policyService } from '../../../services/policy.service';
+import { policyService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { StatusBadge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
+import { StatusBadge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 export const PolicyDetails = () => {
   const { id } = useParams();

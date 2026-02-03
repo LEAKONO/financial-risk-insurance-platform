@@ -5,15 +5,15 @@ import {
   CurrencyDollarIcon,
   UserGroupIcon,
   DocumentTextIcon,
-  ClipboardListIcon,
+  ClipboardDocumentListIcon,
   ArrowDownTrayIcon,
   EyeIcon,
   PrinterIcon,
   CalendarIcon,
   FunnelIcon,
   ClockIcon,
-  TrendingUpIcon,
-  TrendingDownIcon
+  TrendingUp,
+  TrendingDown
 } from '@heroicons/react/24/outline';
 import FinancialReport from '../../../components/admin/reports/FinancialReport';
 import ReportGenerator from '../../../components/admin/reports/ReportGenerator';
@@ -34,7 +34,7 @@ const AdminReports = () => {
     { value: 'financial', label: 'Financial Reports', icon: CurrencyDollarIcon },
     { value: 'user', label: 'User Analytics', icon: UserGroupIcon },
     { value: 'policy', label: 'Policy Reports', icon: DocumentTextIcon },
-    { value: 'claim', label: 'Claim Analysis', icon: ClipboardListIcon },
+    { value: 'claim', label: 'Claim Analysis', icon: ClipboardDocumentListIcon },
     { value: 'risk', label: 'Risk Assessment', icon: ChartBarIcon },
     { value: 'system', label: 'System Performance', icon: ClockIcon }
   ];
@@ -249,9 +249,9 @@ const AdminReports = () => {
                   : 'bg-red-100 dark:bg-red-900/30'
               }`}>
                 {kpi.trend === 'up' ? (
-                  <TrendingUpIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
                 ) : (
-                  <TrendingDownIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
                 )}
               </div>
             </div>
@@ -338,7 +338,7 @@ const AdminReports = () => {
                 By status
               </p>
             </div>
-            <ClipboardListIcon className="w-6 h-6 text-gray-400" />
+            <ClipboardDocumentListIcon className="w-6 h-6 text-gray-400" />
           </div>
           <div className="h-64">
             <PieChart data={claimDistribution} />

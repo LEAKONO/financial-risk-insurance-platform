@@ -4,7 +4,7 @@ import {
   TrendingUp, DollarSign, Download, Filter,
   ChevronDown, Calendar, BarChart3, PieChart
 } from 'lucide-react';
-import { adminService } from '../../../services/admin.service';
+import { adminService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
 import { LineChart } from '../../charts/LineChart';
 import { BarChart } from '../../charts/BarChart';

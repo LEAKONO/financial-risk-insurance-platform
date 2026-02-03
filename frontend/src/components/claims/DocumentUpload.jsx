@@ -10,7 +10,7 @@ import { Card } from '@/components/ui/Card/Card';
 import { Button } from '@/components/ui/Button/Button';
 import { Progress } from '@/components/ui/Progress/Progress';
 import { useToast } from '@/hooks/useToast';
-import { claimService } from '@/services/claim.service';
+import { claimService } from '@/services/api';
 
 const ACCEPTED_TYPES = {
   'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.heic', '.heif'],
@@ -473,4 +473,4 @@ export const DocumentUpload = ({ claimId, requiredDocuments = [], onComplete, on
       )}
     </div>
   );
-};
+};export default DocumentUpload;

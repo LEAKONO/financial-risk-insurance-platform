@@ -73,4 +73,5 @@ const TablePagination = ({
   )
 }
 
+export { TablePagination }
 export default TablePagination

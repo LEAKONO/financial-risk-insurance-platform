@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, AlertCircle, 
-  Shield, Target, Award, TrendingUp as TrendingUpIcon,
+  Shield, Target, Award, 
   BarChart2, Activity, Zap, Thermometer
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card/Card';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { Button } from '@/components/ui/Button/Button';
 import { formatPercentage } from '@/utils/formatters';
-import { riskService } from '@/services/risk.service';
+import { riskService } from '@/services/api';
 
 const riskLevels = {
   low: {
@@ -409,7 +409,7 @@ export const RiskScore = ({ score = 50, previousScore, category = 'overall', sho
         {/* Action Buttons */}
         <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
           <Button variant="outline" className="flex items-center gap-2">
-            <TrendingUpIcon className="w-4 h-4" />
+            <TrendingUp className="w-4 h-4" />
             Improve Score
           </Button>
           <Button variant="outline" className="flex items-center gap-2">
@@ -506,4 +506,4 @@ export const RiskScore = ({ score = 50, previousScore, category = 'overall', sho
       </Card>
     </motion.div>
   );
-};
+};export default RiskScore;

@@ -4,7 +4,7 @@ import {
   Users, FileText, DollarSign, TrendingUp,
   Activity, Shield, Clock, AlertCircle
 } from 'lucide-react';
-import { adminService } from '../../../services/admin.service';
+import { adminService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
 
 export const StatsOverview = () => {

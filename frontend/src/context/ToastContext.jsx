@@ -1,8 +1,7 @@
-// frontend/src/context/ToastContext.jsx
 import React, { createContext, useState, useContext, useCallback } from 'react'
 import Toast from '../components/common/Toast'
 
-const ToastContext = createContext({})
+export const ToastContext = createContext({})  // Add 'export' here
 
 export const useToast = () => useContext(ToastContext)
 

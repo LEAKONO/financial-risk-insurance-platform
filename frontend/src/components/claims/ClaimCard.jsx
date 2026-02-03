@@ -17,10 +17,9 @@ import {
   Shield,
   TrendingUp
 } from 'lucide-react';
-import { Badge } from '../../ui/Badge/Badge';
-import { Button } from '../../ui/Button/Button';
-import { formatCurrency, formatDate, getDaysAgo } from '../../../utils/formatters';
-
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { formatCurrency, formatDate, getDaysAgo } from "../../utils/formatters";
 export const ClaimCard = ({ 
   claim, 
   onClick, 

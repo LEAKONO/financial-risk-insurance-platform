@@ -21,4 +21,5 @@ const ButtonGroup = ({ children, className = '' }) => {
   )
 }
 
+export { ButtonGroup }
 export default ButtonGroup

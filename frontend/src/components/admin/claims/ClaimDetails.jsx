@@ -9,13 +9,13 @@ import {
   Upload, Eye, FileCheck, Users, TrendingUp, BarChart,
   ChevronRight, Printer, Share2, Bookmark, Bell
 } from 'lucide-react';
-import { claimService } from '../../../services/claim.service';
+import { claimService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { StatusBadge, PriorityBadge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
-import { Tabs } from '../../ui/Tabs';
-import { Card } from '../../ui/Card';
-import { Modal } from '../../ui/Modal';
+import { StatusBadge, PriorityBadge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Tabs } from '@/components/ui/Tabs';
+import { Card } from '@/components/ui/Card';
+import { Modal } from '@/components/ui/Modal';
 
 export const ClaimDetails = () => {
   const { id } = useParams();
@@ -898,4 +898,4 @@ export const ClaimDetails = () => {
       </div>
     </motion.div>
   );
-};
+};export default ClaimDetails;

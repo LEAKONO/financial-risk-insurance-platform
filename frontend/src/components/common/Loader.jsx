@@ -28,4 +28,5 @@ const Loader = ({ size = 'md', color = 'blue', className = '' }) => {
   )
 }
 
+export { Loader }
 export default Loader

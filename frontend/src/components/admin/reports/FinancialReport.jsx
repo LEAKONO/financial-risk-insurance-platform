@@ -531,4 +531,4 @@ export const FinancialReport = ({ data, onExport }) => {
       </Card>
     </div>
   );
-};
+};export default FinancialReport;

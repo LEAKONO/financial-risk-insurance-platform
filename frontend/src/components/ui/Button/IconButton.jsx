@@ -58,4 +58,5 @@ const IconButton = ({
   )
 }
 
+export { IconButton }
 export default IconButton

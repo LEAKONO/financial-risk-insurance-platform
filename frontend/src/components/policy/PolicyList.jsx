@@ -15,7 +15,7 @@ import { Loader } from '@/components/common/Loader';
 import { EmptyState } from '@/components/common/EmptyState';
 import { Pagination } from '@/components/common/Pagination';
 import { useToast } from '@/hooks/useToast';
-import { policyService } from '@/services/policy.service';
+import { policyService } from '@/services/api';
 
 const statusOptions = [
   { value: '', label: 'All Status' },
@@ -333,4 +333,4 @@ export const PolicyList = ({ onViewPolicy, onCreatePolicy, onEditPolicy }) => {
       )}
     </div>
   );
-};
+};export default PolicyList;

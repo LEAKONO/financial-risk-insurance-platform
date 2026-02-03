@@ -11,7 +11,7 @@ import { Slider } from '@/components/ui/Form/Slider';
 import { Select } from '@/components/ui/Form/Select';
 import { Badge } from '@/components/ui/Badge/Badge';
 import { formatCurrency, formatPercentage } from '@/utils/formatters';
-import { riskService } from '@/services/risk.service';
+import { riskService } from '@/services/api';
 
 const ageGroups = [
   { value: '18-25', label: '18-25', risk: 1.2 },
@@ -553,4 +553,4 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
       )}
     </motion.div>
   );
-};
+};export default RiskCalculator;

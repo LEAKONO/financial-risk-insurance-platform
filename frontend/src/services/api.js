@@ -657,4 +657,14 @@ export const uploadService = {
   },
 }
 
+
+export const activityService = {
+  getActivities: async (params) => api.get("/activities", { params }),
+  getActivityById: async (id) => api.get(`/activities/${id}`),
+  getUserActivities: async (userId, params) => api.get(`/users/${userId}/activities`, { params }),
+  getRecentActivities: async (limit = 10) => api.get(`/activities/recent?limit=${limit}`),
+  logActivity: async (data) => api.post("/activities", data),
+  deleteActivity: async (id) => api.delete(`/activities/${id}`),
+};
+
 export default api

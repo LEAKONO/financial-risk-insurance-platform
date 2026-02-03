@@ -13,7 +13,7 @@ import { TextArea } from '@/components/ui/Form/TextArea';
 import { DatePicker } from '@/components/ui/Form/DatePicker';
 import { FileUpload } from '@/components/ui/Form/FileUpload';
 import { useToast } from '@/hooks/useToast';
-import { policyService } from '@/services/policy.service';
+import { policyService } from '@/services/api';
 
 const policyTypes = [
   { value: 'life', label: 'Life Insurance' },
@@ -471,4 +471,4 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
       )}
     </motion.form>
   );
-};
+};export default PolicyForm;

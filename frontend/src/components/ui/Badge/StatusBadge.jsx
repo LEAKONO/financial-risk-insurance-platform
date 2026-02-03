@@ -48,4 +48,5 @@ const StatusBadge = ({ status }) => {
   )
 }
 
+export { StatusBadge }
 export default StatusBadge

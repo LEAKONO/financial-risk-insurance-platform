@@ -694,4 +694,4 @@ export const UserForm = ({ initialData = {}, onSubmit, onCancel, mode = 'create'
       </div>
     </motion.form>
   );
-};
+};export default UserForm;

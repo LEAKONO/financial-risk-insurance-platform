@@ -3,11 +3,11 @@ import { motion } from 'framer-motion';
 import { 
   UserGroupIcon,
   DocumentTextIcon,
-  ClipboardListIcon,
+  ClipboardDocumentListIcon,
   CurrencyDollarIcon,
   ChartBarIcon,
-  ArrowTrendingUpIcon,
-  ArrowTrendingDownIcon,
+  ArrowTrendingUp,
+  ArrowTrendingDown,
   ClockIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
       value: '342',
       change: '-3.1%',
       isPositive: false,
-      icon: ClipboardListIcon,
+      icon: ClipboardDocumentListIcon,
       color: 'from-orange-500 to-yellow-500'
     },
     {
@@ -123,7 +123,7 @@ const AdminDashboard = () => {
             </div>
             <div className="flex items-center space-x-2">
               <div className="flex items-center text-green-600 dark:text-green-400">
-                <ArrowTrendingUpIcon className="w-5 h-5 mr-1" />
+                <ArrowTrendingUp className="w-5 h-5 mr-1" />
                 <span className="font-semibold">+18.7%</span>
               </div>
             </div>
@@ -293,7 +293,7 @@ const AdminDashboard = () => {
                 Latest claim activities
               </p>
             </div>
-            <ClipboardListIcon className="w-6 h-6 text-gray-400" />
+            <ClipboardDocumentListIcon className="w-6 h-6 text-gray-400" />
           </div>
           
           <div className="space-y-4">

@@ -14,7 +14,7 @@ import { Select } from '@/components/ui/Form/Select';
 import { Pagination } from '@/components/ui/Pagination/Pagination';
 import { formatCurrency, formatDate, formatRelativeTime } from '@/utils/formatters';
 import { useToast } from '@/hooks/useToast';
-import { claimService } from '@/services/claim.service';
+import { claimService } from '@/services/api';
 
 const statusColors = {
   submitted: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300',
@@ -634,4 +634,4 @@ export const ClaimHistory = ({ userId, isAdmin = false }) => {
       </Card>
     </div>
   );
-};
+};export default ClaimHistory;

@@ -6,9 +6,9 @@ import {
   Eye, Edit, Download, MoreVertical,
   Calendar, DollarSign, User, AlertCircle
 } from 'lucide-react';
-import { claimService } from '../../../services/claim.service';
+import { claimService } from "../../../services/api";
 import { Loader, Toast, Pagination } from '../../common';
-import { StatusBadge, PriorityBadge } from '../../ui/Badge';
+import { StatusBadge, PriorityBadge } from '@/components/ui/Badge';
 
 export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
   const navigate = useNavigate();

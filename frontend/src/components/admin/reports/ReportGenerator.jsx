@@ -690,4 +690,4 @@ export const ReportGenerator = () => {
       </div>
     </div>
   );
-};
+};export default ReportGenerator;

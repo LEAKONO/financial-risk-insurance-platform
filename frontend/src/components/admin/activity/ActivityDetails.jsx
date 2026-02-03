@@ -5,9 +5,9 @@ import {
   Calendar, User, FileText, Clock, AlertCircle, 
   CheckCircle, XCircle, Activity, ExternalLink 
 } from 'lucide-react';
-import { activityService } from '../../../services/activity.service';
+import { activityService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { StatusBadge } from '../../ui/Badge';
+import { StatusBadge } from '@/components/ui/Badge';
 
 export const ActivityDetails = () => {
   const { id } = useParams();

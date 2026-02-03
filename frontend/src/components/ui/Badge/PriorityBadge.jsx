@@ -42,4 +42,5 @@ const PriorityBadge = ({ priority = 'medium' }) => {
   )
 }
 
+export { PriorityBadge }
 export default PriorityBadge

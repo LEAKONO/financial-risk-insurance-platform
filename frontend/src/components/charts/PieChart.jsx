@@ -12,8 +12,8 @@ import {
   AlertCircle,
   ChevronRight
 } from 'lucide-react';
-import { Button } from '../../ui/Button/Button';
-import { Badge } from '../../ui/Badge/Badge';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { ChartTooltip } from './ChartTooltip';
 
 export const PieChart = ({

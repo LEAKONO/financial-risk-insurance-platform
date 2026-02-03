@@ -10,12 +10,12 @@ import {
   Ban, Trash2, ArrowUpDown, ArrowDown,
   ArrowUp
 } from 'lucide-react';
-import { policyService } from '../../../services/policy.service';
+import { policyService } from "../../../services/api";
 import { Loader, Toast, Pagination } from '../../common';
-import { StatusBadge } from '../../../ui/Badge';
+import { StatusBadge } from '@/components/ui/Badge';
 import { PolicyActions } from './PolicyActions';
-import { Button } from '../../../ui/Button';
-import './PolicyTable.css';
+import { Button } from '@/components/ui/Button';
+// import './PolicyTable.css';
 
 export const PolicyTable = ({ filters = {}, showFilters = true, onPolicyClick, compact = false }) => {
   const navigate = useNavigate();
@@ -862,4 +862,4 @@ export const PolicyTable = ({ filters = {}, showFilters = true, onPolicyClick, c
       )}
     </div>
   );
-};
+};export default PolicyTable;

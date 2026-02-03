@@ -80,4 +80,5 @@ const ConfirmModal = ({
   )
 }
 
+export { ConfirmModal }
 export default ConfirmModal

@@ -71,4 +71,5 @@ const StatsCard = ({
   )
 }
 
+export { StatsCard }
 export default StatsCard

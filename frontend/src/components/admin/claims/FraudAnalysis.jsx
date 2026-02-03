@@ -6,9 +6,9 @@ import {
   TrendingUp, Users, Clock, DollarSign,
   BarChart3, FileText, ExternalLink, Download
 } from 'lucide-react';
-import { claimService } from '../../../services/claim.service';
+import { claimService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { Button } from '../../ui/Button';
+import { Button } from '@/components/ui/Button';
 
 export const FraudAnalysis = () => {
   const { id } = useParams();

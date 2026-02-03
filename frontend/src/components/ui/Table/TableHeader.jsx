@@ -44,4 +44,5 @@ const TableHeader = ({
   )
 }
 
+export { TableHeader }
 export default TableHeader

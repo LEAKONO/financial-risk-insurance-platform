@@ -482,4 +482,4 @@ export const ExportOptions = ({ data, reportType, onExport, onClose }) => {
       </div>
     </Card>
   );
-};
+};export default ExportOptions;

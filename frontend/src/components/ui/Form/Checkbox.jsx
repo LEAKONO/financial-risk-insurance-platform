@@ -36,4 +36,5 @@ const Checkbox = ({
   )
 }
 
+export { Checkbox }
 export default Checkbox

@@ -6,10 +6,10 @@ import {
   FileText, DollarSign, Calendar, User,
   MessageSquare, Paperclip, Send, Save
 } from 'lucide-react';
-import { claimService } from '../../../services/claim.service';
+import { claimService } from "../../../services/api";
 import { Loader, Toast } from '../../common';
-import { StatusBadge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
+import { StatusBadge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 
 export const ClaimReview = () => {
   const { id } = useParams();

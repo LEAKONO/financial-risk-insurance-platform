@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   ExclamationTriangleIcon,
-  HomeIcon,
+  HomeIcon,  // ✅ Fixed
   ArrowLeftIcon,
-  SearchIcon,
+  MagnifyingGlassIcon,
   ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 
@@ -66,7 +66,7 @@ const NotFound = () => {
               >
                 <div className="max-w-md mx-auto">
                   <div className="flex items-center p-4 bg-gray-100 dark:bg-gray-700/50 rounded-2xl mb-4">
-                    <SearchIcon className="w-5 h-5 text-gray-400 mr-3" />
+                    <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 mr-3" />
                     <div className="text-left">
                       <div className="text-sm text-gray-500 dark:text-gray-400">
                         Couldn't find what you were looking for?
