@@ -6,13 +6,13 @@ import {
   CalculatorIcon,
   ShieldCheckIcon,
   ExclamationTriangleIcon,
-  ArrowTrendingUp,
-  ArrowTrendingDown,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   CheckCircleIcon,
   XCircleIcon,
   ArrowRightIcon,
   BoltIcon,
-  User,
+  UserIcon,
   BuildingOfficeIcon,
   HeartIcon,
   CreditCardIcon,
@@ -273,12 +273,12 @@ const RiskAssessment = () => {
             <div className="flex items-center space-x-2 text-sm">
               {riskScore < 65 ? (
                 <>
-                  <ArrowTrendingDown className="w-5 h-5 text-green-500" />
+                  <ArrowTrendingDownIcon className="w-5 h-5 text-green-500" />
                   <span className="text-green-600 dark:text-green-400">Improving</span>
                 </>
               ) : (
                 <>
-                  <ArrowTrendingUp className="w-5 h-5 text-red-500" />
+                  <ArrowTrendingUpIcon className="w-5 h-5 text-red-500" />
                   <span className="text-red-600 dark:text-red-400">Increasing</span>
                 </>
               )}
@@ -346,7 +346,7 @@ const RiskAssessment = () => {
                   {rec.priority === 'Medium' && <ChartBarIcon className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />}
                   {rec.priority === 'Low' && <CheckCircleIcon className="w-6 h-6 text-green-600 dark:text-green-400" />}
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                   rec.priority === 'High' 
                     ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                     : rec.priority === 'Medium'

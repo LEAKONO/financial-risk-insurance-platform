@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
-  User,
+  UserIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
   ChartBarIcon,
@@ -13,7 +13,8 @@ import {
   EyeIcon,
   CalendarIcon,
   UserGroupIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 import ActivityLog from '../../../components/admin/activity/ActivityLog';
 import ActivityFilters from '../../../components/admin/activity/ActivityFilters';
@@ -202,7 +203,7 @@ const AdminActivity = () => {
       case 'delete':
         return { icon: TrashIcon, color: 'text-red-600 bg-red-100 dark:bg-red-900' };
       case 'login':
-        return { icon: User, color: 'text-purple-600 bg-purple-100 dark:bg-purple-900' };
+        return { icon: UserIcon, color: 'text-purple-600 bg-purple-100 dark:bg-purple-900' };
       case 'error':
         return { icon: ExclamationTriangleIcon, color: 'text-orange-600 bg-orange-100 dark:bg-orange-900' };
       default:
@@ -361,7 +362,7 @@ const AdminActivity = () => {
               <div className="text-2xl font-bold">842</div>
               <div className="text-blue-100">User Actions</div>
             </div>
-            <User className="w-8 h-8 opacity-80" />
+            <UserIcon className="w-8 h-8 opacity-80" />
           </div>
           <div className="text-sm text-blue-200">
             67% login activities, 22% profile updates

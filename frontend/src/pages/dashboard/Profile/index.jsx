@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  User,
+  UserIcon,
   EnvelopeIcon,
   PhoneIcon,
   CalendarIcon,
@@ -57,7 +57,7 @@ const DashboardProfile = () => {
   });
 
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: User },
+    { id: 'personal', label: 'Personal Info', icon: UserIcon },
     { id: 'security', label: 'Security', icon: LockClosedIcon },
     { id: 'notifications', label: 'Notifications', icon: BellIcon },
     { id: 'preferences', label: 'Preferences', icon: DevicePhoneMobileIcon }
@@ -116,7 +116,7 @@ const DashboardProfile = () => {
           {/* Profile Photo */}
           <div className="relative">
             <div className="w-32 h-32 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <User className="w-16 h-16" />
+              <UserIcon className="w-16 h-16" />
             </div>
             <button
               onClick={() => setIsUploadPhotoOpen(true)}
@@ -200,14 +200,14 @@ const DashboardProfile = () => {
                     value={profileData.firstName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
                     disabled={!isEditing}
-                    icon={User}
+                    icon={UserIcon}
                   />
                   <Input
                     label="Last Name"
                     value={profileData.lastName}
                     onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
                     disabled={!isEditing}
-                    icon={User}
+                    icon={UserIcon}
                   />
                   <Input
                     label="Email Address"

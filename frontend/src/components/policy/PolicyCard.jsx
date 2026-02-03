@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Shield, Calendar, DollarSign, Clock, 
   AlertCircle, CheckCircle, XCircle, MoreVertical,
-  FileText, Users, TrendingUp
+  FileText, Users, TrendingUp, Heart, Home, Car, Briefcase
 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button/Button';
@@ -202,4 +202,6 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
       </div>
     </motion.div>
   );
-};export default PolicyCard;
+};
+
+export default PolicyCard;

@@ -12,8 +12,8 @@ import {
   CalendarIcon,
   FunnelIcon,
   ClockIcon,
-  TrendingUp,
-  TrendingDown
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import FinancialReport from '../../../components/admin/reports/FinancialReport';
 import ReportGenerator from '../../../components/admin/reports/ReportGenerator';
@@ -249,9 +249,9 @@ const AdminReports = () => {
                   : 'bg-red-100 dark:bg-red-900/30'
               }`}>
                 {kpi.trend === 'up' ? (
-                  <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <TrendingUpIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
                 ) : (
-                  <TrendingDown className="w-5 h-5 text-red-600 dark:text-red-400" />
+                  <TrendingDownIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
                 )}
               </div>
             </div>

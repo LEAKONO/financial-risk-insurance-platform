@@ -8,7 +8,7 @@ const Button = ({
   children,
   variant = 'primary',
   size = 'md',
-  icon: Icon,
+  icon,
   iconPosition = 'left',
   loading = false,
   disabled = false,
@@ -41,19 +41,38 @@ const Button = ({
   
   const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`
   
+  // Helper function to render icon
+  const renderIcon = (position) => {
+    if (!icon || loading || iconPosition !== position) return null
+    
+    const iconSizeClass = size === 'xs' ? 'h-3 w-3' : size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'
+    const spacingClass = children ? (position === 'left' ? 'mr-2' : 'ml-2') : ''
+    
+    // If icon is a React element (JSX)
+    if (React.isValidElement(icon)) {
+      return React.cloneElement(icon, {
+        className: `${iconSizeClass} ${spacingClass} ${icon.props?.className || ''}`
+      })
+    }
+    
+    // If icon is a component reference (function)
+    if (typeof icon === 'function') {
+      const IconComponent = icon
+      return <IconComponent className={`${iconSizeClass} ${spacingClass}`} />
+    }
+    
+    return null
+  }
+  
   const content = (
     <>
-      {Icon && iconPosition === 'left' && !loading && (
-        <Icon className={`${size === 'xs' ? 'h-3 w-3' : size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} ${children ? 'mr-2' : ''}`} />
-      )}
+      {renderIcon('left')}
       {loading ? (
         <Loader size="sm" color={variant === 'primary' || variant === 'danger' ? 'white' : 'blue'} />
       ) : (
         children
       )}
-      {Icon && iconPosition === 'right' && !loading && (
-        <Icon className={`${size === 'xs' ? 'h-3 w-3' : size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} ${children ? 'ml-2' : ''}`} />
-      )}
+      {renderIcon('right')}
     </>
   )
   
