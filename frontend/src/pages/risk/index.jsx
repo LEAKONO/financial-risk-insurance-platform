@@ -66,19 +66,21 @@ const RiskAssessment = () => {
     }
   ];
 
-  const riskHistory = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-    datasets: [
-      {
-        label: 'Risk Score',
-        data: [72, 70, 68, 67, 66, 65, 64, 65, 65, 65, 65, 65],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        fill: true,
-        tension: 0.4
-      }
-    ]
-  };
+  // Transform Chart.js format to D3 LineChart format
+  const riskHistoryData = [
+    { date: 'Jan', value: 72 },
+    { date: 'Feb', value: 70 },
+    { date: 'Mar', value: 68 },
+    { date: 'Apr', value: 67 },
+    { date: 'May', value: 66 },
+    { date: 'Jun', value: 65 },
+    { date: 'Jul', value: 64 },
+    { date: 'Aug', value: 65 },
+    { date: 'Sep', value: 65 },
+    { date: 'Oct', value: 65 },
+    { date: 'Nov', value: 65 },
+    { date: 'Dec', value: 65 }
+  ];
 
   const recommendations = [
     {
@@ -190,7 +192,7 @@ const RiskAssessment = () => {
           
           <div className="relative">
             <RiskScore score={riskScore} size={200} />
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
                 <div className="text-4xl font-bold">{riskScore}</div>
                 <div className="text-sm text-blue-100">/100</div>
@@ -286,7 +288,19 @@ const RiskAssessment = () => {
           </div>
           
           <div className="h-64">
-            <LineChart data={riskHistory} />
+            {/* Pass data in D3 format */}
+            <LineChart 
+              data={riskHistoryData}
+              width={300}
+              height={250}
+              xField="date"
+              yField="value"
+              title=""
+              showLegend={false}
+              showGrid={true}
+              timeFormat="%b"
+              yAxisFormat={d => `${d}`}
+            />
           </div>
           
           <div className="mt-6 space-y-3">

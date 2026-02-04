@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { 
   TrendingUp, TrendingDown, AlertCircle, 
   Shield, Target, Award, 
-  BarChart2, Activity, Zap, Thermometer
+  BarChart2, Activity, Zap, Thermometer,
+  Briefcase, MapPin  // ← ADDED THESE MISSING ICONS
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card/Card';
 import { Badge } from '@/components/ui/Badge/Badge';
@@ -298,14 +299,14 @@ export const RiskScore = ({ score = 50, previousScore, category = 'overall', sho
             { 
               label: 'Occupation Risk', 
               score: 70, 
-              icon: Briefcase,
+              icon: Briefcase,  // ← NOW PROPERLY IMPORTED
               description: 'Based on job type and environment',
               factors: ['Job Type', 'Work Environment', 'Travel']
             },
             { 
               label: 'Geographic Risk', 
               score: 55, 
-              icon: MapPin,
+              icon: MapPin,  // ← NOW PROPERLY IMPORTED
               description: 'Based on location and environment',
               factors: ['Crime Rate', 'Disaster Risk', 'Infrastructure']
             }
@@ -506,4 +507,6 @@ export const RiskScore = ({ score = 50, previousScore, category = 'overall', sho
       </Card>
     </motion.div>
   );
-};export default RiskScore;
+};
+
+export default RiskScore;

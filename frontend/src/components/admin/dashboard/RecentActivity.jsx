@@ -33,9 +33,17 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
   const fetchActivities = async () => {
     try {
       setLoading(true);
-      const response = await activityService.getRecentActivities(limit, filter !== 'all' ? filter : undefined);
-      setActivities(response);
+      // FIXED: Now calls the correct method with proper parameters
+      const response = await activityService.getRecentActivities(limit, filter !== 'all' ? filter : null);
+      
+      if (response.success) {
+        setActivities(response.data || []);
+      } else {
+        console.error('Failed to load activities:', response.message);
+        setToast({ type: 'error', message: response.message || 'Failed to load activities' });
+      }
     } catch (error) {
+      console.error('Error fetching activities:', error);
       setToast({ type: 'error', message: 'Failed to load recent activities' });
     } finally {
       setLoading(false);
@@ -53,6 +61,7 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
   const getActivityIcon = (action, entity) => {
     switch (action) {
       case 'create':
+      case 'submit':
         return <FileText className="text-green-500" size={16} />;
       case 'update':
         return <Activity className="text-blue-500" size={16} />;
@@ -60,6 +69,8 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
         return <XCircle className="text-red-500" size={16} />;
       case 'login':
         return <CheckCircle className="text-purple-500" size={16} />;
+      case 'approve':
+        return <CheckCircle className="text-emerald-500" size={16} />;
       case 'error':
         return <AlertCircle className="text-yellow-500" size={16} />;
       default:
@@ -73,18 +84,22 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
   };
 
   const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return date.toLocaleDateString();
+    } catch (error) {
+      return 'Recent';
+    }
   };
 
   const handleRefresh = () => {
@@ -98,7 +113,21 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
       animate={{ opacity: 1 }}
       className="bg-white rounded-xl shadow-lg p-6"
     >
-      <Toast toast={toast} onClose={() => setToast(null)} />
+      {toast && (
+        <div className={`mb-4 p-3 rounded-lg ${
+          toast.type === 'error' ? 'bg-red-100 text-red-700' :
+          toast.type === 'success' ? 'bg-green-100 text-green-700' :
+          'bg-blue-100 text-blue-700'
+        }`}>
+          {toast.message}
+          <button 
+            onClick={() => setToast(null)} 
+            className="float-right font-bold"
+          >
+            ×
+          </button>
+        </div>
+      )}
       
       {/* Header */}
       {showHeader && (
@@ -119,8 +148,9 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
                 loading ? 'text-indigo-600 animate-spin' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-100'
               }`}
               title="Refresh"
+              disabled={loading}
             >
-              <RefreshCw size={20} />
+              <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
             </button>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -165,8 +195,9 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
       <div className="space-y-4">
         <AnimatePresence>
           {loading ? (
-            <div className="py-12">
-              <Loader />
+            <div className="py-12 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+              <p className="mt-2 text-gray-500">Loading activities...</p>
             </div>
           ) : activities.length === 0 ? (
             <div className="text-center py-12">
@@ -254,30 +285,32 @@ export const RecentActivity = ({ limit = 10, showHeader = true, showFilters = tr
       </div>
 
       {/* Stats Footer */}
-      <div className="mt-6 pt-6 border-t">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatItem
-            label="Total Activities"
-            value={activities.length}
-            icon={<Activity className="text-blue-500" />}
-          />
-          <StatItem
-            label="User Actions"
-            value={activities.filter(a => a.entity === 'user').length}
-            icon={<User className="text-green-500" />}
-          />
-          <StatItem
-            label="Policy Updates"
-            value={activities.filter(a => a.entity === 'policy').length}
-            icon={<FileText className="text-purple-500" />}
-          />
-          <StatItem
-            label="High Priority"
-            value={activities.filter(a => a.severity === 'high').length}
-            icon={<AlertCircle className="text-red-500" />}
-          />
+      {activities.length > 0 && (
+        <div className="mt-6 pt-6 border-t">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatItem
+              label="Total Activities"
+              value={activities.length}
+              icon={<Activity className="text-blue-500" />}
+            />
+            <StatItem
+              label="User Actions"
+              value={activities.filter(a => a.entity === 'user').length}
+              icon={<User className="text-green-500" />}
+            />
+            <StatItem
+              label="Policy Updates"
+              value={activities.filter(a => a.entity === 'policy').length}
+              icon={<FileText className="text-purple-500" />}
+            />
+            <StatItem
+              label="High Priority"
+              value={activities.filter(a => a.severity === 'high').length}
+              icon={<AlertCircle className="text-red-500" />}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 };

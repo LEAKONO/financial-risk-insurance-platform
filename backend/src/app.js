@@ -1,3 +1,4 @@
+// backend/src/app.js - REMOVE activity routes
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -23,6 +24,7 @@ const policyRoutes = require('./routes/policy.routes');
 const claimRoutes = require('./routes/claim.routes');
 const adminRoutes = require('./routes/admin.routes');
 const insuranceRoutes = require('./routes/insurance.routes');
+// REMOVE THIS LINE: const activityRoutes = require('./routes/activity.routes');
 
 const app = express();
 
@@ -90,6 +92,7 @@ app.use('/api/policies', policyRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/insurance', insuranceRoutes);
+// REMOVE THIS LINE: app.use('/api/activities', activityRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -10,7 +10,8 @@ import {
   TrendingUp,
   Info,
   AlertCircle,
-  ChevronRight
+  ChevronRight,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -39,7 +40,9 @@ export const PieChart = ({
   padAngle = 0.01,
   cornerRadius = 4,
   className = '',
-  onSliceClick = null
+  onSliceClick = null,
+  isLoading = false,
+  error = null
 }) => {
   const svgRef = useRef();
   const legendRef = useRef();
@@ -48,17 +51,94 @@ export const PieChart = ({
   const [hiddenCategories, setHiddenCategories] = useState(new Set());
   const [tooltipData, setTooltipData] = useState(null);
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [localData, setLocalData] = useState([]);
 
-  // Filter and sort data
-  const filteredData = data.filter(d => !hiddenCategories.has(d[labelField]));
-  const sortedData = sort
-    ? [...filteredData].sort((a, b) => b[valueField] - a[valueField])
+  // Validate and normalize data
+  useEffect(() => {
+    if (!data) {
+      setLocalData([]);
+      return;
+    }
+
+    // If data is already an array, use it
+    if (Array.isArray(data)) {
+      setLocalData(data);
+      return;
+    }
+
+    // If data is an object, convert to array
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      // Try different common data formats
+      
+      // Format 1: Object with data property
+      if (data.data && Array.isArray(data.data)) {
+        setLocalData(data.data);
+        return;
+      }
+      
+      // Format 2: Object with values property
+      if (data.values && Array.isArray(data.values)) {
+        setLocalData(data.values);
+        return;
+      }
+      
+      // Format 3: Object with results property
+      if (data.results && Array.isArray(data.results)) {
+        setLocalData(data.results);
+        return;
+      }
+      
+      // Format 4: Convert object to array
+      const dataArray = Object.entries(data).map(([key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          return {
+            [labelField]: key,
+            [valueField]: value[valueField] || 0,
+            ...value
+          };
+        }
+        return {
+          [labelField]: key,
+          [valueField]: value,
+          label: key,
+          value: value
+        };
+      });
+      setLocalData(dataArray);
+      return;
+    }
+
+    // If data is not an array or object, set empty array
+    setLocalData([]);
+  }, [data, labelField, valueField]);
+
+  // Filter and sort data - with validation
+  const filteredData = Array.isArray(localData) 
+    ? localData.filter(d => d && typeof d === 'object' && !hiddenCategories.has(d[labelField]))
+    : [];
+
+  const sortedData = sort && Array.isArray(filteredData)
+    ? [...filteredData].sort((a, b) => {
+        const aVal = a && a[valueField];
+        const bVal = b && b[valueField];
+        return (bVal || 0) - (aVal || 0);
+      })
     : filteredData;
 
-  const totalValue = d3.sum(sortedData, d => d[valueField]);
+  const totalValue = Array.isArray(sortedData) ? d3.sum(sortedData, d => {
+    const val = d && d[valueField];
+    return typeof val === 'number' ? val : 0;
+  }) : 0;
 
   useEffect(() => {
-    if (!sortedData || sortedData.length === 0) return;
+    if (!Array.isArray(sortedData) || sortedData.length === 0) {
+      // Clear chart if no data
+      d3.select(svgRef.current).selectAll('*').remove();
+      if (legendRef.current) {
+        d3.select(legendRef.current).selectAll('*').remove();
+      }
+      return;
+    }
 
     // Clear previous chart
     d3.select(svgRef.current).selectAll('*').remove();
@@ -83,7 +163,10 @@ export const PieChart = ({
 
     // Create pie generator
     const pie = d3.pie()
-      .value(d => d[valueField])
+      .value(d => {
+        const val = d[valueField];
+        return typeof val === 'number' ? val : 0;
+      })
       .sort(sort ? null : (a, b) => 0)
       .startAngle(startAngle)
       .endAngle(endAngle)
@@ -118,11 +201,12 @@ export const PieChart = ({
 
         setHoveredSlice(d.data);
         
-        const percentage = ((d.data[valueField] / totalValue) * 100).toFixed(1);
+        const val = d.data[valueField];
+        const percentage = totalValue > 0 ? ((val / totalValue) * 100) : 0;
         setTooltipData({
           label: d.data[labelField],
-          value: d.data[valueField],
-          percentage,
+          value: val,
+          percentage: percentage.toFixed(1),
           color: colorScale(d.data[labelField]),
           ...d.data
         });
@@ -146,7 +230,7 @@ export const PieChart = ({
       .attr('fill', d => colorScale(d.data[labelField]))
       .attr('stroke', 'white')
       .attr('stroke-width', 2)
-      .attr('class', d => `pie-slice slice-${d.data[labelField].replace(/\s+/g, '-')}`)
+      .attr('class', d => `pie-slice slice-${String(d.data[labelField]).replace(/\s+/g, '-')}`)
       .transition()
       .duration(1000)
       .attrTween('d', function(d) {
@@ -170,7 +254,8 @@ export const PieChart = ({
         .style('fill', '#374151')
         .style('pointer-events', 'none')
         .text(d => {
-          const percentage = ((d.data[valueField] / totalValue) * 100);
+          const val = d.data[valueField];
+          const percentage = totalValue > 0 ? ((val / totalValue) * 100) : 0;
           return percentage > 5 ? `${percentage.toFixed(0)}%` : '';
         });
     }
@@ -221,7 +306,7 @@ export const PieChart = ({
           setSelectedSlice(d);
         })
         .on('mouseover', function(event, d) {
-          const slice = chart.select(`.slice-${d[labelField].replace(/\s+/g, '-')}`);
+          const slice = chart.select(`.slice-${String(d[labelField]).replace(/\s+/g, '-')}`);
           slice.transition()
             .duration(200)
             .attr('transform', 'scale(1.05)');
@@ -229,12 +314,12 @@ export const PieChart = ({
           setHoveredSlice(d);
         })
         .on('mouseout', function(event, d) {
-          const slice = chart.select(`.slice-${d[labelField].replace(/\s+/g, '-')}`);
+          const slice = chart.select(`.slice-${String(d[labelField]).replace(/\s+/g, '-')}`);
           slice.transition()
             .duration(200)
             .attr('transform', 'scale(1)');
           
-          if (hoveredSlice?.label === d[labelField]) {
+          if (hoveredSlice?.[labelField] === d[labelField]) {
             setHoveredSlice(null);
           }
         });
@@ -242,20 +327,22 @@ export const PieChart = ({
       legendItems.append('div')
         .attr('class', 'flex items-center space-x-3')
         .html(d => {
-          const percentage = ((d[valueField] / totalValue) * 100).toFixed(1);
+          const val = d[valueField];
+          const percentage = totalValue > 0 ? ((val / totalValue) * 100).toFixed(1) : '0.0';
           const isHidden = hiddenCategories.has(d[labelField]);
+          const label = String(d[labelField] || '');
           return `
             <div class="flex items-center space-x-3">
-              <div class="w-4 h-4 rounded-full" style="background-color: ${colorScale(d[labelField])}"></div>
+              <div class="w-4 h-4 rounded-full" style="background-color: ${colorScale(label)}"></div>
               <div class="flex items-center space-x-2">
-                <span class="font-medium ${isHidden ? 'line-through text-gray-400' : 'text-gray-700'}">${d[labelField]}</span>
+                <span class="font-medium ${isHidden ? 'line-through text-gray-400' : 'text-gray-700'}">${label}</span>
                 <button class="text-gray-400 hover:text-gray-600 transition-colors">
                   ${isHidden ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.59 6.59m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>' : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>'}
                 </button>
               </div>
             </div>
             <div class="flex items-center space-x-4">
-              <span class="font-bold text-gray-900">${d[valueField].toLocaleString()}</span>
+              <span class="font-bold text-gray-900">${val?.toLocaleString() || '0'}</span>
               <span class="text-sm text-gray-500">${percentage}%</span>
               <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -288,33 +375,79 @@ export const PieChart = ({
 
   const handleDownload = () => {
     const svgElement = svgRef.current;
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+    if (!svgElement) return;
     
-    canvas.width = width;
-    canvas.height = height;
-    
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0);
-      const pngUrl = canvas.toDataURL('image/png');
+    try {
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
       
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = `${title.replace(/\s+/g, '_')}_pie_chart.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    };
-    
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+      canvas.width = width;
+      canvas.height = height;
+      
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        const pngUrl = canvas.toDataURL('image/png');
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pngUrl;
+        downloadLink.download = `${title.replace(/\s+/g, '_')}_pie_chart.png`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      };
+      
+      img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+    } catch (error) {
+      console.error('Error downloading chart:', error);
+    }
   };
 
   const handleReset = () => {
     setHiddenCategories(new Set());
     setSelectedSlice(null);
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <RefreshCw className="w-8 h-8 text-gray-400 animate-spin mb-4" />
+          <p className="text-gray-500">Loading chart data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <AlertCircle className="w-8 h-8 text-red-400 mb-4" />
+          <p className="text-red-500 font-medium">Error loading chart</p>
+          <p className="text-gray-500 text-sm mt-2">{error.message || 'Failed to load data'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty data state
+  if (!Array.isArray(localData) || localData.length === 0) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <PieChartIcon className="w-6 h-6 text-gray-400" />
+          </div>
+          <p className="text-gray-500 font-medium">No data available</p>
+          <p className="text-gray-400 text-sm mt-2">Data will appear here once available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -392,20 +525,20 @@ export const PieChart = ({
                   <span>Selected: {selectedSlice[labelField]}</span>
                 </h4>
                 <Badge variant="primary">
-                  {((selectedSlice[valueField] / totalValue) * 100).toFixed(1)}%
+                  {totalValue > 0 ? ((selectedSlice[valueField] / totalValue) * 100).toFixed(1) : 0}%
                 </Badge>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-blue-600">Value</div>
                   <div className="text-2xl font-bold text-blue-800">
-                    {selectedSlice[valueField].toLocaleString()}
+                    {selectedSlice[valueField]?.toLocaleString() || '0'}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-blue-600">Share of Total</div>
                   <div className="text-2xl font-bold text-blue-800">
-                    {((selectedSlice[valueField] / totalValue) * 100).toFixed(1)}%
+                    {totalValue > 0 ? ((selectedSlice[valueField] / totalValue) * 100).toFixed(1) : 0}%
                   </div>
                 </div>
               </div>
@@ -466,7 +599,7 @@ export const PieChart = ({
                 {sortedData[0][labelField]}
               </div>
               <div className="text-sm text-gray-600">
-                {((sortedData[0][valueField] / totalValue) * 100).toFixed(1)}% of total
+                {totalValue > 0 ? ((sortedData[0][valueField] / totalValue) * 100).toFixed(1) : 0}% of total
               </div>
             </>
           )}
@@ -491,7 +624,7 @@ export const PieChart = ({
             <div className="text-sm font-medium text-amber-700">Data Quality</div>
           </div>
           <div className="text-lg font-bold text-gray-900">
-            {data.length - sortedData.length} Hidden
+            {localData.length - sortedData.length} Hidden
           </div>
           <div className="text-sm text-gray-600">
             Click legend items to toggle visibility
@@ -503,28 +636,83 @@ export const PieChart = ({
 };
 
 // Mini pie chart for dashboards
-export const MiniPieChart = ({ data, size = 120, colors = ['#4f46e5', '#10b981', '#f59e0b'], label = '' }) => {
+export const MiniPieChart = ({ 
+  data = [], 
+  size = 120, 
+  colors = ['#4f46e5', '#10b981', '#f59e0b'], 
+  label = '',
+  isLoading = false 
+}) => {
   const svgRef = useRef();
+  const [localData, setLocalData] = useState([]);
+
+  // Validate and normalize data for mini chart
+  useEffect(() => {
+    if (!data) {
+      setLocalData([]);
+      return;
+    }
+
+    if (Array.isArray(data)) {
+      setLocalData(data);
+      return;
+    }
+
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      const dataArray = Object.entries(data).map(([key, value]) => {
+        if (typeof value === 'object' && value !== null) {
+          return {
+            label: key,
+            value: value.value || 0,
+            ...value
+          };
+        }
+        return {
+          label: key,
+          value: value
+        };
+      });
+      setLocalData(dataArray);
+      return;
+    }
+
+    setLocalData([]);
+  }, [data]);
 
   useEffect(() => {
-    if (!data || data.length === 0) return;
+    if (!Array.isArray(localData) || localData.length === 0) {
+      d3.select(svgRef.current).selectAll('*').remove();
+      return;
+    }
 
-    const total = d3.sum(data, d => d.value);
+    const total = d3.sum(localData, d => {
+      const val = d && d.value;
+      return typeof val === 'number' ? val : 0;
+    });
+    
+    if (total <= 0) {
+      d3.select(svgRef.current).selectAll('*').remove();
+      return;
+    }
+
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
 
     const radius = size / 2;
-    const pie = d3.pie().value(d => d.value);
+    const pie = d3.pie().value(d => {
+      const val = d.value;
+      return typeof val === 'number' ? val : 0;
+    });
     const arc = d3.arc()
       .innerRadius(0)
       .outerRadius(radius);
 
     const colorScale = d3.scaleOrdinal()
-      .domain(data.map(d => d.label))
+      .domain(localData.map(d => d.label))
       .range(colors);
 
     const arcs = svg.selectAll('.mini-arc')
-      .data(pie(data))
+      .data(pie(localData))
       .enter()
       .append('g')
       .attr('transform', `translate(${radius},${radius})`);
@@ -544,7 +732,15 @@ export const MiniPieChart = ({ data, size = 120, colors = ['#4f46e5', '#10b981',
         .style('fill', '#6b7280')
         .text(label);
     }
-  }, [data, size, colors, label]);
+  }, [localData, size, colors, label]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center" style={{ width: size, height: size + (label ? 20 : 0) }}>
+        <RefreshCw className="w-6 h-6 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <motion.div

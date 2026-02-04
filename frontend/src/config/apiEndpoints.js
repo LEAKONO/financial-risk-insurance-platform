@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     CHANGE_PASSWORD: `${API_BASE_URL}/users/change-password`,
     ACTIVITY: `${API_BASE_URL}/users/activity`,
     UPLOAD_AVATAR: `${API_BASE_URL}/users/upload-profile-picture`,
+    DELETE_ACCOUNT: `${API_BASE_URL}/users/account`,
   },
   
   // Risk
@@ -45,7 +46,7 @@ export const API_ENDPOINTS = {
     DOCUMENTS: (id) => `${API_BASE_URL}/policies/${id}/documents`,
     PAYMENTS: (id) => `${API_BASE_URL}/policies/${id}/payments`,
     ADMIN_LIST: `${API_BASE_URL}/policies/admin/all`,
-    ADMIN_UPDATE_STATUS: (id) => `${API_BASEURL}/policies/admin/${id}/status`,
+    ADMIN_UPDATE_STATUS: (id) => `${API_BASE_URL}/policies/admin/${id}/status`,
   },
   
   // Claims
@@ -86,5 +87,15 @@ export const API_ENDPOINTS = {
     FINANCIAL_REPORT: `${API_BASE_URL}/admin/reports/financial`,
     RISK_PROFILES: `${API_BASE_URL}/admin/reports/risk-profiles`,
     GENERATE_REPORT: `${API_BASE_URL}/admin/reports/generate`,
+  },
+
+  // Activities
+  ACTIVITIES: {
+    LIST: `${API_BASE_URL}/activities`,
+    GET: (id) => `${API_BASE_URL}/activities/${id}`,
+    USER_ACTIVITIES: (userId) => `${API_BASE_URL}/users/${userId}/activities`,
+    RECENT: (limit) => `${API_BASE_URL}/activities/recent?limit=${limit}`,
+    CREATE: `${API_BASE_URL}/activities`,
+    DELETE: (id) => `${API_BASE_URL}/activities/${id}`,
   },
 }

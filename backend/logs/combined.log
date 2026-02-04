@@ -734,3 +734,71 @@
 {"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 15:29:52"}
 {"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 15:30:22"}
 {"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 15:30:52"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 17:38:38"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 17:38:38"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 17:40:21"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 17:40:21"}
+{"level":"warn","message":"404: GET /api/activities?page=1&limit=20","service":"financial-risk-insurance","timestamp":"2026-02-04 17:40:41"}
+{"level":"warn","message":"404: GET /api/activities?page=1&limit=20","service":"financial-risk-insurance","timestamp":"2026-02-04 17:40:41"}
+{"level":"info","message":"Health check requested from ::1","service":"financial-risk-insurance","timestamp":"2026-02-04 18:08:30"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 18:19:00"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 18:19:00"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-04 18:19:12"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:38"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-04 18:25:40"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:26:28"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:26:28"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:26:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:27:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:27:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:28:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:28:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:29:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:29:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:30:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:30:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:31:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:31:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:32:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:32:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:33:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:33:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:34:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:34:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:35:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:35:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:36:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:36:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:37:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:37:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:38:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:38:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:39:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:39:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:40:27"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:40:57"}
+{"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:41:27"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:06"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:12"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-04 20:22:13"}
+{"level":"info","message":"✅ Verification email sent to leakono@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-04 20:44:32"}
+{"level":"debug","message":"Email ID: <bc1b67fe-1940-835a-7646-b89db3967e77@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:44:32"}
+{"level":"info","message":"✅ Verification email sent to leakono@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-04 20:44:39"}
+{"level":"debug","message":"Email ID: <269f6967-077e-06eb-0bbc-cd5939cd8ea2@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:44:39"}
+{"level":"info","message":"✅ Verification email sent to firefox@ajiraemobilis.org","service":"financial-risk-insurance","timestamp":"2026-02-04 20:46:06"}
+{"level":"debug","message":"Email ID: <7e112c27-9f7b-27a6-115d-2c6b3453ead7@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:46:06"}
+{"level":"info","message":"✅ Verification email sent to leakonoemmanuel3@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:50"}
+{"level":"debug","message":"Email ID: <f1385ad7-c612-66d9-793d-f913098798db@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:50"}
+{"level":"info","message":"✅ Verification email sent to leakonoemmanuel3@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:57"}
+{"level":"debug","message":"Email ID: <4d0f00e5-9f96-08c4-61eb-69b490524f14@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:57"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-04 21:04:27"}

@@ -1,15 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import { 
+  curveLinear,
+  curveMonotoneX,
+  curveMonotoneY,
+  curveNatural,
+  curveStep,
+  curveBasis,
+  curveCardinal,
+  curveCatmullRom
+} from 'd3-shape';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   TrendingUp, 
   TrendingDown, 
   Download,
-  Filter,
   Maximize2,
   Minimize2,
   Info,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -35,7 +45,9 @@ export const LineChart = ({
   isMultiSeries = false,
   timeFormat = '%Y-%m-%d',
   yAxisFormat = d => `$${d3.format(',.0f')(d)}`,
-  className = ''
+  className = '',
+  isLoading = false,
+  error = null
 }) => {
   const svgRef = useRef();
   const tooltipRef = useRef();
@@ -44,39 +56,143 @@ export const LineChart = ({
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomTransform, setZoomTransform] = useState(null);
+  const [localData, setLocalData] = useState([]);
+
+  // Curve function mapping
+  const curveMap = {
+    linear: curveLinear,
+    monotoneX: curveMonotoneX,
+    monotoneY: curveMonotoneY,
+    natural: curveNatural,
+    step: curveStep,
+    basis: curveBasis,
+    cardinal: curveCardinal,
+    catmullRom: curveCatmullRom
+  };
+
+  // Validate and normalize data
+  useEffect(() => {
+    if (!data) {
+      setLocalData([]);
+      return;
+    }
+
+    // If data is already an array, use it
+    if (Array.isArray(data)) {
+      setLocalData(data);
+      return;
+    }
+
+    // If data is an object, convert to array
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      // Try different common data formats
+      
+      // Format 1: Object with data property
+      if (data.data && Array.isArray(data.data)) {
+        setLocalData(data.data);
+        return;
+      }
+      
+      // Format 2: Object with values property
+      if (data.values && Array.isArray(data.values)) {
+        setLocalData(data.values);
+        return;
+      }
+      
+      // Format 3: Object with results property
+      if (data.results && Array.isArray(data.results)) {
+        setLocalData(data.results);
+        return;
+      }
+      
+      // Format 4: Object keys as series
+      if (isMultiSeries) {
+        const seriesArray = Object.entries(data).map(([key, value]) => ({
+          [seriesField]: key,
+          [xField]: 'date' in value ? value.date : new Date().toISOString().split('T')[0],
+          [yField]: 'value' in value ? value.value : value
+        }));
+        setLocalData(seriesArray);
+        return;
+      }
+      
+      // Format 5: Convert object to array of values
+      const dataArray = Object.entries(data).map(([key, value]) => ({
+        [xField]: key,
+        [yField]: value,
+        ...(typeof value === 'object' ? value : {})
+      }));
+      setLocalData(dataArray);
+      return;
+    }
+
+    // If data is not an array or object, set empty array
+    setLocalData([]);
+  }, [data, isMultiSeries, seriesField, xField, yField]);
 
   // Prepare data based on chart type
   const prepareData = () => {
-    if (!data || data.length === 0) return [];
+    if (!localData || !Array.isArray(localData) || localData.length === 0) return [];
     
-    if (isMultiSeries && seriesField) {
-      // Group data by series
-      const grouped = d3.group(data, d => d[seriesField]);
-      const series = Array.from(grouped, ([key, values]) => ({
-        key,
-        values: values.map(d => ({
-          ...d,
-          [xField]: d3.timeParse(timeFormat)(d[xField]) || d[xField]
-        })).sort((a, b) => a[xField] - b[xField])
-      }));
-      return series;
-    } else {
-      // Single series
-      return [{
-        key: 'default',
-        values: data.map(d => ({
-          ...d,
-          [xField]: d3.timeParse(timeFormat)(d[xField]) || d[xField]
-        })).sort((a, b) => a[xField] - b[xField])
-      }];
+    try {
+      if (isMultiSeries && seriesField) {
+        // Group data by series
+        const grouped = d3.group(localData, d => {
+          if (d && typeof d === 'object' && seriesField in d) {
+            return d[seriesField];
+          }
+          return 'default';
+        });
+        
+        const series = Array.from(grouped, ([key, values]) => ({
+          key,
+          values: values.map(d => {
+            const dateValue = d[xField];
+            return {
+              ...d,
+              [xField]: d3.timeParse(timeFormat)(dateValue) || dateValue
+            };
+          }).sort((a, b) => {
+            const aDate = a[xField];
+            const bDate = b[xField];
+            return (aDate instanceof Date ? aDate.getTime() : aDate) - 
+                   (bDate instanceof Date ? bDate.getTime() : bDate);
+          })
+        }));
+        return series;
+      } else {
+        // Single series
+        return [{
+          key: 'default',
+          values: localData.map(d => {
+            const dateValue = d[xField];
+            return {
+              ...d,
+              [xField]: d3.timeParse(timeFormat)(dateValue) || dateValue
+            };
+          }).sort((a, b) => {
+            const aDate = a[xField];
+            const bDate = b[xField];
+            return (aDate instanceof Date ? aDate.getTime() : aDate) - 
+                   (bDate instanceof Date ? bDate.getTime() : bDate);
+          })
+        }];
+      }
+    } catch (error) {
+      console.error('Error preparing chart data:', error);
+      return [];
     }
   };
 
   const preparedData = prepareData();
-  const allValues = preparedData.flatMap(d => d.values);
+  const allValues = preparedData.flatMap(d => d.values) || [];
   
   useEffect(() => {
-    if (!allValues || allValues.length === 0) return;
+    if (!allValues || allValues.length === 0) {
+      // Clear chart if no data
+      d3.select(svgRef.current).selectAll('*').remove();
+      return;
+    }
 
     // Clear previous chart
     d3.select(svgRef.current).selectAll('*').remove();
@@ -88,9 +204,6 @@ export const LineChart = ({
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    // Parse dates
-    const parseDate = d3.timeParse(timeFormat);
-    
     // Create scales
     const xScale = d3.scaleTime()
       .domain(d3.extent(allValues, d => d[xField]))
@@ -137,9 +250,10 @@ export const LineChart = ({
         .style('opacity', 0.5);
     }
 
-    // Create line generator
+    // Create line generator with proper curve function
+    const selectedCurve = curveMap[curveType] || curveMonotoneX;
     const lineGenerator = d3.line()
-      .curve(d3[curveType])
+      .curve(selectedCurve)
       .x(d => xScale(d[xField]))
       .y(d => yScale(d[yField]));
 
@@ -275,20 +389,22 @@ export const LineChart = ({
     return () => {
       d3.select(svgRef.current).selectAll('*').remove();
     };
-  }, [data, width, height, margin, colors, activeSeries, zoomTransform, isZoomed]);
+  }, [localData, width, height, margin, colors, activeSeries, zoomTransform, isZoomed, curveType, preparedData, allValues]);
 
   // Calculate statistics
   const calculateStats = () => {
     if (!allValues || allValues.length === 0) return null;
     
-    const values = allValues.map(d => d[yField]);
+    const values = allValues.map(d => d[yField]).filter(v => v != null);
+    if (values.length === 0) return null;
+    
     const mean = d3.mean(values) || 0;
     const median = d3.median(values) || 0;
     const min = d3.min(values) || 0;
     const max = d3.max(values) || 0;
     const latest = values[values.length - 1] || 0;
     const first = values[0] || 0;
-    const growth = ((latest - first) / first) * 100;
+    const growth = first !== 0 ? ((latest - first) / first) * 100 : 0;
 
     return {
       mean,
@@ -304,27 +420,33 @@ export const LineChart = ({
 
   const handleDownload = () => {
     const svgElement = svgRef.current;
-    const svgData = new XMLSerializer().serializeToString(svgElement);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
+    if (!svgElement) return;
     
-    canvas.width = width;
-    canvas.height = height;
-    
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0);
-      const pngUrl = canvas.toDataURL('image/png');
+    try {
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
       
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = `${title.replace(/\s+/g, '_')}_chart.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    };
-    
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+      canvas.width = width;
+      canvas.height = height;
+      
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        const pngUrl = canvas.toDataURL('image/png');
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pngUrl;
+        downloadLink.download = `${title.replace(/\s+/g, '_')}_chart.png`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      };
+      
+      img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+    } catch (error) {
+      console.error('Error downloading chart:', error);
+    }
   };
 
   const handleZoomToggle = () => {
@@ -333,6 +455,46 @@ export const LineChart = ({
       setZoomTransform(null);
     }
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <RefreshCw className="w-8 h-8 text-gray-400 animate-spin mb-4" />
+          <p className="text-gray-500">Loading chart data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <AlertCircle className="w-8 h-8 text-red-400 mb-4" />
+          <p className="text-red-500 font-medium">Error loading chart</p>
+          <p className="text-gray-500 text-sm mt-2">{error.message || 'Failed to load data'}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty data state
+  if (!localData || localData.length === 0) {
+    return (
+      <div className={`bg-white rounded-xl shadow-lg border border-gray-200 p-6 ${className}`}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <TrendingUp className="w-6 h-6 text-gray-400" />
+          </div>
+          <p className="text-gray-500 font-medium">No data available</p>
+          <p className="text-gray-400 text-sm mt-2">Data will appear here once available</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -496,11 +658,32 @@ export const LineChart = ({
 };
 
 // Mini line chart for dashboards
-export const MiniLineChart = ({ data, width = 120, height = 40, color = '#4f46e5' }) => {
+export const MiniLineChart = ({ 
+  data = [],
+  width = 120, 
+  height = 40, 
+  color = '#4f46e5',
+  curveType = 'monotoneX'
+}) => {
   const svgRef = useRef();
 
+  // Curve function mapping for MiniLineChart
+  const curveMap = {
+    linear: curveLinear,
+    monotoneX: curveMonotoneX,
+    monotoneY: curveMonotoneY,
+    natural: curveNatural,
+    step: curveStep,
+    basis: curveBasis,
+    cardinal: curveCardinal,
+    catmullRom: curveCatmullRom
+  };
+
   useEffect(() => {
-    if (!data || data.length === 0) return;
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      d3.select(svgRef.current).selectAll('*').remove();
+      return;
+    }
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
@@ -517,7 +700,9 @@ export const MiniLineChart = ({ data, width = 120, height = 40, color = '#4f46e5
       .domain([d3.min(data), d3.max(data)])
       .range([innerHeight, 0]);
 
+    const selectedCurve = curveMap[curveType] || curveMonotoneX;
     const line = d3.line()
+      .curve(selectedCurve)
       .x((d, i) => xScale(i))
       .y(d => yScale(d));
 
@@ -528,7 +713,7 @@ export const MiniLineChart = ({ data, width = 120, height = 40, color = '#4f46e5
       .attr('stroke', color)
       .attr('stroke-width', 1.5)
       .attr('d', line);
-  }, [data, width, height, color]);
+  }, [data, width, height, color, curveType]);
 
   return (
     <svg

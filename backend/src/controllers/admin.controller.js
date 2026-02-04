@@ -1,3 +1,4 @@
+// backend/src/controllers/admin.controller.js - FIXED VERSION
 const User = require('../models/User');
 const Policy = require('../models/Policy');
 const Claim = require('../models/Claim');
@@ -6,6 +7,7 @@ const ActivityLog = require('../models/ActivityLog');
 const AnalyticsService = require('../services/analytics.service');
 const ClaimService = require('../services/claim.service');
 const { logger } = require('../utils/logger.util');
+
 class AdminController {
   /**
    * Get admin dashboard data
@@ -389,6 +391,121 @@ class AdminController {
       res.status(500).json({
         success: false,
         message: 'Failed to load system activity'
+      });
+    }
+  }
+  
+  /**
+   * Get recent activity - FIXED VERSION
+   */
+  async getRecentActivity(req, res) {
+    try {
+      const limit = parseInt(req.query.limit) || 10;
+      
+      const activities = await ActivityLog.find()
+        .populate('user', 'firstName lastName email')
+        .sort({ timestamp: -1 })
+        .limit(limit)
+        .lean();
+      
+      // Format activities for frontend - using arrow functions to preserve 'this'
+      const formattedActivities = activities.map(activity => {
+        const actionLabels = {
+          'user_login': 'User Login',
+          'user_register': 'User Registration',
+          'policy_created': 'Policy Created',
+          'policy_updated': 'Policy Updated',
+          'claim_submitted': 'Claim Submitted',
+          'claim_updated': 'Claim Updated',
+          'payment_processed': 'Payment Processed',
+          'update_role': 'Role Updated',
+          'activate_user': 'User Activated',
+          'deactivate_user': 'User Deactivated',
+          'update_policy_status': 'Policy Status Updated',
+          'generate_report': 'Report Generated',
+          'risk_assessment': 'Risk Assessment',
+          'profile_update': 'Profile Updated'
+        };
+        
+        const icons = {
+          'user_login': '👤',
+          'user_register': '📝',
+          'policy_created': '📄',
+          'policy_updated': '✏️',
+          'claim_submitted': '⚠️',
+          'claim_updated': '🔄',
+          'payment_processed': '💰',
+          'update_role': '🛡️',
+          'activate_user': '✅',
+          'deactivate_user': '❌',
+          'update_policy_status': '📊',
+          'generate_report': '📈',
+          'risk_assessment': '📋',
+          'profile_update': '👤'
+        };
+        
+        const details = activity.details || {};
+        
+        const getDescription = () => {
+          switch (activity.action) {
+            case 'user_login':
+              return `User logged in from IP: ${details.ip || 'Unknown'}`;
+            case 'user_register':
+              return `New user registered: ${details.email || 'Unknown'}`;
+            case 'policy_created':
+              return `Policy created: ${details.policyNumber || 'Unknown'}`;
+            case 'claim_submitted':
+              return `Claim submitted: ${details.claimNumber || 'Unknown'}`;
+            case 'update_role':
+              return `Updated role for ${details.targetUser || 'user'} to ${details.newRole || 'Unknown'}`;
+            case 'activate_user':
+            case 'deactivate_user':
+              return `${activity.action === 'activate_user' ? 'Activated' : 'Deactivated'} user: ${details.targetUser || 'Unknown'}`;
+            case 'update_policy_status':
+              return `Updated policy ${details.policyNumber || 'Unknown'} to ${details.newStatus || 'Unknown'}`;
+            case 'generate_report':
+              return `Generated ${details.reportType || 'Unknown'} report`;
+            default:
+              const actionLabel = actionLabels[activity.action] || activity.action.replace(/_/g, ' ').toUpperCase();
+              return `${actionLabel} performed`;
+          }
+        };
+        
+        const getType = () => {
+          const action = activity.action;
+          if (action.includes('user')) return 'user';
+          if (action.includes('policy')) return 'policy';
+          if (action.includes('claim')) return 'claim';
+          if (action.includes('payment')) return 'payment';
+          if (action.includes('report')) return 'report';
+          return 'system';
+        };
+        
+        return {
+          id: activity._id,
+          action: actionLabels[activity.action] || activity.action.replace(/_/g, ' ').toUpperCase(),
+          user: {
+            name: activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : 'System',
+            email: activity.user?.email || 'system'
+          },
+          description: getDescription(),
+          timestamp: activity.timestamp,
+          icon: icons[activity.action] || '📝',
+          type: getType()
+        };
+      });
+      
+      res.json({
+        success: true,
+        data: formattedActivities,
+        total: formattedActivities.length
+      });
+    } catch (error) {
+      logger.error(`Get recent activity controller error: ${error.message}`);
+      console.error(error.stack); // Add this to see full error
+      res.status(500).json({
+        success: false,
+        message: 'Failed to load recent activities'
       });
     }
   }

@@ -32,7 +32,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
   const fetchClaims = async () => {
     try {
       setLoading(true);
-      const response = await claimService.getClaims({
+      const response = await claimService.getAdminClaims({
         ...filters,
         search,
         page: pagination.page,
@@ -41,10 +41,35 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
         sortOrder: sortConfig.direction
       });
       
-      setClaims(response.data || []);
-      setPagination(response.pagination || pagination);
+      // Handle different response structures
+      const responseData = response.data;
+      
+      // Check if data is in response.data.data (nested) or response.data (direct)
+      let claimsData = [];
+      let paginationData = pagination;
+      
+      if (responseData.data && Array.isArray(responseData.data)) {
+        // Nested structure: { success: true, data: [...], pagination: {...} }
+        claimsData = responseData.data;
+        paginationData = responseData.pagination || pagination;
+      } else if (Array.isArray(responseData)) {
+        // Direct array: [...]
+        claimsData = responseData;
+      } else if (responseData.claims && Array.isArray(responseData.claims)) {
+        // Alternative structure: { claims: [...], pagination: {...} }
+        claimsData = responseData.claims;
+        paginationData = responseData.pagination || pagination;
+      } else {
+        console.warn('Unexpected response structure:', responseData);
+        claimsData = [];
+      }
+      
+      setClaims(claimsData);
+      setPagination(paginationData);
     } catch (error) {
+      console.error('Failed to load claims:', error);
       setToast({ type: 'error', message: 'Failed to load claims' });
+      setClaims([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -68,6 +93,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
   };
 
   const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return '$0';
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
@@ -77,9 +103,11 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      year: 'numeric'
     });
   };
 
@@ -158,7 +186,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                       <Loader />
                     </td>
                   </tr>
-                ) : claims.length === 0 ? (
+                ) : !claims || claims.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center space-y-3">
@@ -169,7 +197,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                   </tr>
                 ) : (
                   claims.map((claim, index) => (
-                    <React.Fragment key={claim.id || index}>
+                    <React.Fragment key={claim._id || claim.id || index}>
                       <motion.tr
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -178,16 +206,16 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                       >
                         <td className="py-4 px-6">
                           <div className="font-mono font-semibold text-gray-900">
-                            {claim.claimNumber}
+                            {claim.claimNumber || 'N/A'}
                           </div>
                         </td>
                         <td className="py-4 px-6">
                           <span className="capitalize px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                            {claim.type}
+                            {claim.type || 'N/A'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
-                          <div className="text-gray-700">{claim.policy?.policyNumber}</div>
+                          <div className="text-gray-700">{claim.policy?.policyNumber || 'N/A'}</div>
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center space-x-3">
@@ -195,8 +223,8 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                               <User size={16} className="text-indigo-600" />
                             </div>
                             <div>
-                              <div className="font-medium">{claim.user?.name}</div>
-                              <div className="text-sm text-gray-500">{claim.user?.email}</div>
+                              <div className="font-medium">{claim.user?.name || claim.user?.firstName || 'Unknown'}</div>
+                              <div className="text-sm text-gray-500">{claim.user?.email || ''}</div>
                             </div>
                           </div>
                         </td>
@@ -213,7 +241,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <StatusBadge status={claim.status} />
+                          <StatusBadge status={claim.status || 'pending'} />
                         </td>
                         <td className="py-4 px-6">
                           <PriorityBadge priority={claim.priority || 'medium'} />
@@ -221,14 +249,14 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                         <td className="py-4 px-6">
                           <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => navigate(`/admin/claims/${claim.id}`)}
+                              onClick={() => navigate(`/admin/claims/${claim._id || claim.id}`)}
                               className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                               title="View Details"
                             >
                               <Eye size={18} />
                             </button>
                             <button
-                              onClick={() => toggleRowExpand(claim.id)}
+                              onClick={() => toggleRowExpand(claim._id || claim.id)}
                               className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
                               title="More Actions"
                             >
@@ -240,7 +268,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                       
                       {/* Expanded Row */}
                       <AnimatePresence>
-                        {expandedRows.has(claim.id) && (
+                        {expandedRows.has(claim._id || claim.id) && (
                           <motion.tr
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
@@ -253,7 +281,7 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
                                   <div>
                                     <h4 className="font-medium text-gray-700 mb-2">Description</h4>
                                     <p className="text-sm text-gray-600 line-clamp-3">
-                                      {claim.description}
+                                      {claim.description || 'No description provided'}
                                     </p>
                                   </div>
                                   <div>
@@ -291,46 +319,50 @@ export const ClaimsTable = ({ filters = {}, showFilters = true }) => {
         </div>
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t">
-          <Pagination
-            currentPage={pagination.page}
-            totalPages={pagination.pages}
-            onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
-            totalItems={pagination.total}
-            itemsPerPage={pagination.limit}
-          />
-        </div>
+        {claims && claims.length > 0 && (
+          <div className="px-6 py-4 border-t">
+            <Pagination
+              currentPage={pagination.page}
+              totalPages={pagination.pages}
+              onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+              totalItems={pagination.total}
+              itemsPerPage={pagination.limit}
+            />
+          </div>
+        )}
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Claims"
-          value={pagination.total}
-          change="+12%"
-          color="blue"
-        />
-        <StatCard
-          title="Pending Review"
-          value={claims.filter(c => c.status === 'pending').length}
-          change="+5%"
-          color="yellow"
-        />
-        <StatCard
-          title="Approved"
-          value={claims.filter(c => c.status === 'approved').length}
-          change="+18%"
-          color="green"
-        />
-        <StatCard
-          title="Average Claim"
-          value={formatCurrency(
-            claims.reduce((sum, claim) => sum + claim.claimedAmount, 0) / claims.length || 0
-          )}
-          change="+8%"
-          color="purple"
-        />
-      </div>
+      {claims && claims.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <StatCard
+            title="Total Claims"
+            value={pagination.total}
+            change="+12%"
+            color="blue"
+          />
+          <StatCard
+            title="Pending Review"
+            value={claims.filter(c => c.status === 'pending').length}
+            change="+5%"
+            color="yellow"
+          />
+          <StatCard
+            title="Approved"
+            value={claims.filter(c => c.status === 'approved').length}
+            change="+18%"
+            color="green"
+          />
+          <StatCard
+            title="Average Claim"
+            value={formatCurrency(
+              claims.reduce((sum, claim) => sum + (claim.claimedAmount || 0), 0) / claims.length || 0
+            )}
+            change="+8%"
+            color="purple"
+          />
+        </div>
+      )}
     </div>
   );
 };
