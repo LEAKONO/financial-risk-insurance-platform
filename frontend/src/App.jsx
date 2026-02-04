@@ -9,6 +9,7 @@ import { LoadingProvider } from './context/LoadingContext'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import ErrorBoundary from './components/common/ErrorBoundary'
 import MainLayout from './components/layout/MainLayout'
+import DashboardLayout from './components/layout/DashboardLayout'
 import AdminLayout from './components/layout/AdminLayout'
 
 // Pages
@@ -34,41 +35,49 @@ const App = () => {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <LoadingProvider>
-            <ToastProvider>
-              <ModalProvider>
-                <Router>
+        <Router>
+          <AuthProvider>
+            <LoadingProvider>
+              <ToastProvider>
+                <ModalProvider>
                   <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
                     <Routes>
-                      {/* Public Routes */}
+                      {/* Public Routes - MainLayout */}
                       <Route path="/" element={<MainLayout />}>
                         <Route index element={<Home />} />
-                        <Route path="login" element={<Login />} />
-                        <Route path="register" element={<Register />} />
-                        <Route path="forgot-password" element={<ForgotPassword />} />
-                        <Route path="reset-password/:token" element={<ResetPassword />} />
                         <Route path="risk-assessment" element={<RiskAssessment />} />
                       </Route>
 
-                      {/* User Dashboard Routes */}
-                      <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                          <MainLayout />
-                        </ProtectedRoute>
-                      }>
+                      {/* Auth Routes - Standalone (no layout) */}
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+                      {/* User Dashboard Routes - DashboardLayout */}
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <DashboardLayout />
+                          </ProtectedRoute>
+                        }
+                      >
                         <Route index element={<DashboardOverview />} />
                         <Route path="claims" element={<DashboardClaims />} />
                         <Route path="policies" element={<DashboardPolicies />} />
                         <Route path="profile" element={<DashboardProfile />} />
                       </Route>
 
-                      {/* Admin Routes */}
-                      <Route path="/admin" element={
-                        <ProtectedRoute adminOnly={true}>
-                          <AdminLayout />
-                        </ProtectedRoute>
-                      }>
+                      {/* Admin Routes - AdminLayout */}
+                      <Route
+                        path="/admin"
+                        element={
+                          <ProtectedRoute adminOnly={true}>
+                            <AdminLayout />
+                          </ProtectedRoute>
+                        }
+                      >
                         <Route index element={<AdminDashboard />} />
                         <Route path="users" element={<AdminUsers />} />
                         <Route path="policies" element={<AdminPolicies />} />
@@ -77,15 +86,15 @@ const App = () => {
                         <Route path="activity" element={<AdminActivity />} />
                       </Route>
 
-                      {/* 404 */}
+                      {/* 404 Route */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </div>
-                </Router>
-              </ModalProvider>
-            </ToastProvider>
-          </LoadingProvider>
-        </AuthProvider>
+                </ModalProvider>
+              </ToastProvider>
+            </LoadingProvider>
+          </AuthProvider>
+        </Router>
       </ThemeProvider>
     </ErrorBoundary>
   )

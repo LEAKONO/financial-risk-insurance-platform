@@ -514,3 +514,91 @@
 {"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-03 20:06:55"}
 {"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-03 20:06:55"}
 {"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-03 20:06:56"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-03 22:24:34"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:15"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-03 22:26:16"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:33"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:34"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:34"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:34"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:34"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:34"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-04 12:39:35"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:15:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:15:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:15:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:16:15"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:16:45"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:17:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:17:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:18:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:18:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:19:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:19:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:20:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:20:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:21:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:21:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:22:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:22:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:23:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:23:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:24:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:24:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:25:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:25:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:26:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:26:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:27:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:27:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:28:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:28:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:29:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:29:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:30:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:30:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:31:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:31:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:32:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:32:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:33:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:33:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:34:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:34:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:35:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:35:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:36:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:36:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:37:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:37:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:38:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:38:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:39:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:39:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:40:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:40:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:41:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:41:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:42:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:42:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:43:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:43:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:44:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:44:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:45:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:45:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:46:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:46:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:47:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:47:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:48:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:48:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:49:14"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:49:44"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:50:15"}
+{"level":"warn","message":"404: GET /api/activities/recent?limit=10","service":"financial-risk-insurance","timestamp":"2026-02-04 13:50:45"}

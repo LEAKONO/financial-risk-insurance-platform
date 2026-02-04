@@ -23,8 +23,6 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
 
-  const from = location.state?.from?.pathname || '/dashboard'
-
   const validateForm = () => {
     const newErrors = {}
     
@@ -52,13 +50,30 @@ const Login = () => {
     try {
       const result = await login(formData.email, formData.password)
       
+      console.log('🔐 Login Result:', result)
+      
       if (result.success) {
         success('Login successful!')
-        navigate(from, { replace: true })
+        
+        // Get user from result
+        const user = result.user
+        
+        console.log('👤 User Data:', user)
+        console.log('🎭 User Role:', user?.role)
+        
+        // Redirect based on user role
+        if (user?.role === 'admin') {
+          console.log('🔴 Redirecting to ADMIN dashboard')
+          navigate('/admin', { replace: true })
+        } else {
+          console.log('🔵 Redirecting to USER dashboard')
+          navigate('/dashboard', { replace: true })
+        }
       } else {
         error(result.error || 'Login failed')
       }
     } catch (err) {
+      console.error('❌ Login Error:', err)
       error('An unexpected error occurred')
     } finally {
       setLoading(false)
@@ -81,7 +96,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-md w-full space-y-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -191,11 +206,19 @@ const Login = () => {
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-900">Demo Accounts</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Use <span className="font-mono font-medium">demo@example.com</span> with password{' '}
-                <span className="font-mono font-medium">Demo@123</span> to test the platform.
-              </p>
+              <h4 className="font-medium text-blue-900 mb-2">Demo Accounts</h4>
+              <div className="space-y-2 text-sm text-blue-700">
+                <div>
+                  <p className="font-semibold">Regular User:</p>
+                  <p>Email: <span className="font-mono font-medium">demo@example.com</span></p>
+                  <p>Password: <span className="font-mono font-medium">Demo@123</span></p>
+                </div>
+                <div className="pt-2 border-t border-blue-200">
+                  <p className="font-semibold">Admin User:</p>
+                  <p>Email: <span className="font-mono font-medium">admin@example.com</span></p>
+                  <p>Password: <span className="font-mono font-medium">Admin@123</span></p>
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>

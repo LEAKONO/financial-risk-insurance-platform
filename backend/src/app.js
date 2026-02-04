@@ -24,14 +24,44 @@ const claimRoutes = require('./routes/claim.routes');
 const adminRoutes = require('./routes/admin.routes');
 const insuranceRoutes = require('./routes/insurance.routes');
 
-
 const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// CORS configuration - FIXED
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // List of allowed origins
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://localhost:5174'
+    ];
+    
+    // Add any FRONTEND_URL from environment variable
+    if (process.env.FRONTEND_URL) {
+      const envUrls = process.env.FRONTEND_URL.split(',');
+      allowedOrigins.push(...envUrls);
+    }
+    
+    // In development, be more permissive
+    if (process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    }
+    
+    // Check if origin is allowed
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200 // For legacy browser support
 }));
 
 // Rate limiting
@@ -60,7 +90,6 @@ app.use('/api/policies', policyRoutes);
 app.use('/api/claims', claimRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/insurance', insuranceRoutes);
-
 
 // Health check
 app.get('/health', (req, res) => {
