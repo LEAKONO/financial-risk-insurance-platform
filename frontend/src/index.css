@@ -58,3 +58,66 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500;
 }
+/* Add to your index.css or globals.css */
+
+/* Prevent body scroll issues */
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Ensure root container fills viewport */
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Fix any layout shift issues */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent sidebar from causing horizontal scroll */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 50;
+}
+
+/* Ensure main content doesn't overflow */
+main {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Fix footer positioning */
+footer {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
