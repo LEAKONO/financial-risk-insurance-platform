@@ -1,10 +1,11 @@
+// frontend/src/pages/auth/Register/index.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  UserIcon,  // ✅ Fixed
-  EnvelopeIcon, 
-  LockClosedIcon, 
+  UserIcon,
+  EnvelopeIcon,
+  LockClosedIcon,
   PhoneIcon,
   CalendarIcon,
   EyeIcon,
@@ -14,25 +15,66 @@ import {
 } from '@heroicons/react/24/outline';
 import RegisterForm from '../../../components/auth/RegisterForm';
 import SocialAuth from '../../../components/auth/SocialAuth';
-import { useAuth } from '../../../hooks/useAuth';
-import { useToast } from '../../../hooks/useToast';
+import { useAuth } from '../../../context/AuthContext';
+import { useToast } from '../../../context/ToastContext';
 
 const Register = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { register } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async (formData) => {
+    console.log('📝 Registration form data:', formData);
+    
+    // Ensure dateOfBirth is in YYYY-MM-DD format
+    let dateOfBirth = formData.dateOfBirth;
+    if (dateOfBirth && dateOfBirth.includes('T')) {
+      dateOfBirth = dateOfBirth.split('T')[0];
+    }
+    
+    // Prepare registration data
+    const registrationData = {
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      dateOfBirth: dateOfBirth // Send in YYYY-MM-DD format
+    };
+    
+    console.log('📤 Sending to API:', registrationData);
+    
     setIsLoading(true);
     try {
-      await register(data);
-      showToast('Registration successful! Please check your email.', 'success');
-      navigate('/dashboard');
+      const result = await register(registrationData);
+      
+      console.log('📥 Registration result:', result);
+      
+      if (result.success) {
+        showToast('Registration successful!', 'success');
+        // Redirect to dashboard after short delay
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      } else {
+        // Handle specific error messages
+        let errorMessage = result.error || 'Registration failed';
+        
+        if (errorMessage.toLowerCase().includes('already exists') || 
+            errorMessage.toLowerCase().includes('duplicate')) {
+          errorMessage = 'Email already registered. Please use a different email.';
+        } else if (errorMessage.toLowerCase().includes('required')) {
+          errorMessage = 'Please fill all required fields correctly.';
+        } else if (errorMessage.toLowerCase().includes('validation')) {
+          errorMessage = 'Please check your information and try again.';
+        }
+        
+        showToast(errorMessage, 'error');
+      }
     } catch (error) {
-      showToast(error.message || 'Registration failed', 'error');
+      console.error('❌ Registration error:', error);
+      showToast('Registration failed. Please try again.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +116,7 @@ const Register = () => {
               <div className="flex-1">
                 <div className="text-center mb-8">
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-600 mb-4">
-                    <UserIcon className="w-8 h-8 text-white" />  {/* ✅ Fixed */}
+                    <UserIcon className="w-8 h-8 text-white" />
                   </div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h1>
                   <p className="text-gray-600 dark:text-gray-400 mt-2">
@@ -82,7 +124,10 @@ const Register = () => {
                   </p>
                 </div>
                 
-                <RegisterForm onSubmit={handleSubmit} isLoading={isLoading} />
+                <RegisterForm 
+                  onSubmit={handleSubmit} 
+                  isLoading={isLoading} 
+                />
                 
                 <div className="mt-8">
                   <SocialAuth />

@@ -825,3 +825,4 @@
 {"level":"debug","message":"Email ID: <d1a9f364-2d0a-795d-70f3-2df4241c09c1@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:47"}
 {"level":"info","message":"✅ Verification email sent to newcustomer@example.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:52:27"}
 {"level":"debug","message":"Email ID: <3bfd4079-ebcd-a624-1cc3-340fbe441085@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:52:27"}
+{"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-05 21:50:02"}
