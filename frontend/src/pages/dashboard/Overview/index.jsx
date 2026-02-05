@@ -17,6 +17,8 @@ import LineChart from '../../../components/charts/LineChart';
 import PieChart from '../../../components/charts/PieChart';
 
 const DashboardOverview = () => {
+  console.log('🟢 DashboardOverview rendered');
+
   const stats = [
     {
       title: 'Active Policies',
@@ -60,7 +62,12 @@ const DashboardOverview = () => {
       premium: '$450',
       status: 'active',
       nextPayment: '2024-02-15',
-      coverage: '$500,000'
+      coverage: '$500,000',
+      type: 'life',
+      totalPremium: 450,
+      totalCoverage: 500000,
+      endDate: '2024-12-31',
+      riskScore: 65
     },
     {
       id: 2,
@@ -69,7 +76,12 @@ const DashboardOverview = () => {
       premium: '$320',
       status: 'active',
       nextPayment: '2024-02-20',
-      coverage: '$250,000'
+      coverage: '$250,000',
+      type: 'health',
+      totalPremium: 320,
+      totalCoverage: 250000,
+      endDate: '2024-12-31',
+      riskScore: 45
     },
     {
       id: 3,
@@ -78,7 +90,12 @@ const DashboardOverview = () => {
       premium: '$180',
       status: 'pending',
       nextPayment: '2024-02-25',
-      coverage: '$100,000'
+      coverage: '$100,000',
+      type: 'auto',
+      totalPremium: 180,
+      totalCoverage: 100000,
+      endDate: '2024-12-31',
+      riskScore: 75
     }
   ];
 
@@ -144,6 +161,23 @@ const DashboardOverview = () => {
         ]
       }
     ]
+  };
+
+  // Transform policy data for PolicyCard component
+  const getPolicyCardData = (policy) => {
+    return {
+      id: policy.id,
+      name: policy.name,
+      policyNumber: policy.policyNumber,
+      status: policy.status,
+      type: policy.type,
+      totalPremium: policy.totalPremium,
+      totalCoverage: policy.totalCoverage,
+      endDate: policy.endDate,
+      riskScore: policy.riskScore,
+      description: `${policy.type} insurance coverage`,
+      nextPayment: policy.nextPayment
+    };
   };
 
   return (
@@ -259,7 +293,7 @@ const DashboardOverview = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 * index }}
               >
-                <PolicyCard {...policy} />
+                <PolicyCard policy={getPolicyCardData(policy)} />
               </motion.div>
             ))}
           </div>

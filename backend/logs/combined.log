@@ -802,3 +802,26 @@
 {"level":"info","message":"✅ Verification email sent to leakonoemmanuel3@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:57"}
 {"level":"debug","message":"Email ID: <4d0f00e5-9f96-08c4-61eb-69b490524f14@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-04 20:57:57"}
 {"level":"info","message":"Received shutdown signal, closing server...","service":"financial-risk-insurance","timestamp":"2026-02-04 21:04:27"}
+{"level":"info","message":"Connecting to MongoDB at: mongodb://localhost:27017/financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:38"}
+{"level":"info","message":"✅ MongoDB Connected: localhost","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:39"}
+{"level":"info","message":"📊 Database: financial_risk_insurance","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:39"}
+{"level":"info","message":"Database connected successfully","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:39"}
+{"level":"info","message":"Server running on port 5000","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:39"}
+{"level":"info","message":"Health check: http://localhost:5000/health","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:39"}
+{"level":"info","message":"✅ SMTP connection established","service":"financial-risk-insurance","timestamp":"2026-02-05 20:01:42"}
+{"level":"warn","message":"404: GET /api/activities?page=1&limit=20","service":"financial-risk-insurance","timestamp":"2026-02-05 20:19:30"}
+{"level":"warn","message":"404: GET /api/activities?page=1&limit=20","service":"financial-risk-insurance","timestamp":"2026-02-05 20:19:30"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"debug","message":"Email ID: <73ee9a62-6992-67b6-4f1e-f98284963f85@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"debug","message":"Email ID: <46c47672-bfbe-49e6-8369-43a3f4da2146@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"debug","message":"Email ID: <2e494761-c77e-fa68-3cf7-186d4e737ab7@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:43"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:44"}
+{"level":"debug","message":"Email ID: <bf7de7a5-06a9-d003-5db1-b5358b76d371@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:44"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:46"}
+{"level":"debug","message":"Email ID: <27e641d4-10ca-be07-bec9-cbaa15b11638@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:46"}
+{"level":"info","message":"✅ Verification email sent to leon@gmail.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:47"}
+{"level":"debug","message":"Email ID: <d1a9f364-2d0a-795d-70f3-2df4241c09c1@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:21:47"}
+{"level":"info","message":"✅ Verification email sent to newcustomer@example.com","service":"financial-risk-insurance","timestamp":"2026-02-05 20:52:27"}
+{"level":"debug","message":"Email ID: <3bfd4079-ebcd-a624-1cc3-340fbe441085@gmail.com>","service":"financial-risk-insurance","timestamp":"2026-02-05 20:52:27"}

@@ -14,7 +14,8 @@ const statusConfig = {
   expired: { color: 'bg-gray-100 text-gray-800', icon: Clock },
   cancelled: { color: 'bg-red-100 text-red-800', icon: XCircle },
   lapsed: { color: 'bg-yellow-100 text-yellow-800', icon: AlertCircle },
-  draft: { color: 'bg-blue-100 text-blue-800', icon: FileText }
+  draft: { color: 'bg-blue-100 text-blue-800', icon: FileText },
+  pending: { color: 'bg-yellow-100 text-yellow-800', icon: AlertCircle }
 };
 
 const typeConfig = {
@@ -22,19 +23,48 @@ const typeConfig = {
   health: { color: 'bg-green-500', icon: Heart },
   property: { color: 'bg-blue-500', icon: Home },
   auto: { color: 'bg-purple-500', icon: Car },
-  disability: { color: 'bg-amber-500', icon: Briefcase }
+  disability: { color: 'bg-amber-500', icon: Briefcase },
+  default: { color: 'bg-blue-500', icon: Shield }
 };
 
 export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, className = '' }) => {
-  const StatusIcon = statusConfig[policy.status]?.icon || AlertCircle;
-  const TypeIcon = typeConfig[policy.type]?.icon || Shield;
+  // Null and undefined safety checks
+  if (!policy) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+        <div className="space-y-4">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Safe property access with defaults
+  const policyStatus = policy?.status || 'draft';
+  const policyType = policy?.type || 'default';
+  const policyName = policy?.name || 'Unnamed Policy';
+  const policyNumber = policy?.policyNumber || 'N/A';
+  const totalCoverage = policy?.totalCoverage || 0;
+  const totalPremium = policy?.totalPremium || 0;
+  const endDate = policy?.endDate || new Date().toISOString();
+  const riskScore = policy?.riskScore || 0;
+  const description = policy?.description || `${policyType} insurance coverage`;
+
+  const StatusIcon = statusConfig[policyStatus]?.icon || AlertCircle;
+  const TypeIcon = typeConfig[policyType]?.icon || Shield;
 
   const getDaysRemaining = () => {
-    if (policy.status !== 'active') return 0;
-    const endDate = new Date(policy.endDate);
-    const today = new Date();
-    const diffTime = endDate - today;
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (policyStatus !== 'active') return 0;
+    try {
+      const endDateObj = new Date(endDate);
+      const today = new Date();
+      const diffTime = endDateObj - today;
+      return Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    } catch (error) {
+      return 0;
+    }
   };
 
   const daysRemaining = getDaysRemaining();
@@ -51,27 +81,27 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`${typeConfig[policy.type]?.color || 'bg-blue-500'} p-3 rounded-lg`}>
+            <div className={`${typeConfig[policyType]?.color || 'bg-blue-500'} p-3 rounded-lg`}>
               <TypeIcon className="w-6 h-6 text-white" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">
-                {policy.name}
+                {policyName}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Policy #{policy.policyNumber}
+                Policy #{policyNumber}
               </p>
             </div>
           </div>
           
-          <Badge className={statusConfig[policy.status]?.color}>
+          <Badge className={statusConfig[policyStatus]?.color || 'bg-gray-100 text-gray-800'}>
             <StatusIcon className="w-3 h-3 mr-1" />
-            {policy.status.charAt(0).toUpperCase() + policy.status.slice(1)}
+            {policyStatus.charAt(0).toUpperCase() + policyStatus.slice(1)}
           </Badge>
         </div>
 
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          {policy.description || 'Insurance policy coverage'}
+          {description}
         </p>
 
         {/* Coverage Summary */}
@@ -82,7 +112,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
               <span className="text-sm">Coverage</span>
             </div>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
-              {formatCurrency(policy.totalCoverage)}
+              {formatCurrency(totalCoverage)}
             </p>
           </div>
 
@@ -92,7 +122,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
               <span className="text-sm">Premium</span>
             </div>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
-              {formatCurrency(policy.totalPremium)}/year
+              {formatCurrency(totalPremium)}/year
             </p>
           </div>
 
@@ -102,7 +132,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
               <span className="text-sm">Valid Until</span>
             </div>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {formatDate(policy.endDate)}
+              {formatDate(endDate)}
             </p>
           </div>
 
@@ -121,7 +151,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
       </div>
 
       {/* Risk Indicator */}
-      {policy.riskScore && (
+      {riskScore > 0 && (
         <div className="px-6 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -132,19 +162,19 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
               <div className="w-32 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${policy.riskScore}%` }}
+                  animate={{ width: `${riskScore}%` }}
                   transition={{ duration: 1, delay: 0.3 }}
                   className={`h-full ${
-                    policy.riskScore < 30 ? 'bg-green-500' :
-                    policy.riskScore < 70 ? 'bg-yellow-500' : 'bg-red-500'
+                    riskScore < 30 ? 'bg-green-500' :
+                    riskScore < 70 ? 'bg-yellow-500' : 'bg-red-500'
                   }`}
                 />
               </div>
               <span className={`font-semibold ${
-                policy.riskScore < 30 ? 'text-green-600' :
-                policy.riskScore < 70 ? 'text-yellow-600' : 'text-red-600'
+                riskScore < 30 ? 'text-green-600' :
+                riskScore < 70 ? 'text-yellow-600' : 'text-red-600'
               }`}>
-                {policy.riskScore}/100
+                {riskScore}/100
               </span>
             </div>
           </div>
@@ -163,7 +193,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
             >
               View Details
             </Button>
-            {policy.status === 'active' && (
+            {policyStatus === 'active' && (
               <>
                 <Button
                   variant="ghost"
@@ -183,7 +213,7 @@ export const PolicyCard = ({ policy, onView, onEdit, onRenew, onCancel, classNam
                 </Button>
               </>
             )}
-            {policy.status === 'active' && (
+            {policyStatus === 'active' && (
               <Button
                 variant="ghost"
                 size="sm"

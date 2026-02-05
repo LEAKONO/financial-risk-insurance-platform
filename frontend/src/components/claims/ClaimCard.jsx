@@ -20,6 +20,7 @@ import {
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatCurrency, formatDate, getDaysAgo } from "../../utils/formatters";
+
 export const ClaimCard = ({ 
   claim, 
   onClick, 
@@ -27,8 +28,32 @@ export const ClaimCard = ({
   compact = false,
   className = '' 
 }) => {
+  // Null and undefined safety check
+  if (!claim) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-xl p-6 animate-pulse">
+        <div className="space-y-4">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+        </div>
+      </div>
+    );
+  }
+
   const [isHovered, setIsHovered] = useState(false);
   const [showActionMenu, setShowActionMenu] = useState(false);
+
+  // Safe property access with defaults
+  const claimStatus = claim?.status || 'submitted';
+  const claimType = claim?.type || 'other';
+  const claimNumber = claim?.claimNumber || claim?.id || 'N/A';
+  const description = claim?.description || 'No description available';
+  const claimedAmount = claim?.claimedAmount || claim?.amount || 0;
+  const approvedAmount = claim?.approvedAmount;
+  const incidentDate = claim?.incidentDate || claim?.date || new Date().toISOString();
+  const submittedDate = claim?.submittedDate || claim?.createdAt || new Date().toISOString();
+  const policyNumber = claim?.policy?.policyNumber || claim?.policyName || 'N/A';
 
   const getStatusConfig = (status) => {
     const configs = {
@@ -87,14 +112,16 @@ export const ClaimCard = ({
       'liability': '⚖️',
       'disability': '♿',
       'death': '⚰️',
-      'other': '📄'
+      'other': '📄',
+      'medical': '🏥',
+      'collision': '💥'
     };
     return icons[type] || icons.other;
   };
 
-  const statusConfig = getStatusConfig(claim.status);
+  const statusConfig = getStatusConfig(claimStatus);
   const StatusIcon = statusConfig.icon;
-  const daysAgo = getDaysAgo(claim.submittedDate || claim.createdAt);
+  const daysAgo = getDaysAgo ? getDaysAgo(submittedDate) : 0;
 
   const handleActionClick = (e, action) => {
     e.stopPropagation();
@@ -117,19 +144,19 @@ export const ClaimCard = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="text-2xl">
-              {getClaimTypeIcon(claim.type)}
+              {getClaimTypeIcon(claimType)}
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h4 className="font-semibold text-gray-900">{claim.claimNumber}</h4>
-                <Badge variant={claim.status === 'approved' ? 'success' : 
-                               claim.status === 'rejected' ? 'danger' : 
-                               claim.status === 'paid' ? 'primary' : 'warning'}>
+                <h4 className="font-semibold text-gray-900">{claimNumber}</h4>
+                <Badge variant={claimStatus === 'approved' ? 'success' : 
+                               claimStatus === 'rejected' ? 'danger' : 
+                               claimStatus === 'paid' ? 'primary' : 'warning'}>
                   {statusConfig.label}
                 </Badge>
               </div>
               <p className="text-sm text-gray-600 mt-1 truncate max-w-xs">
-                {claim.description}
+                {description}
               </p>
             </div>
           </div>
@@ -137,7 +164,7 @@ export const ClaimCard = ({
           <div className="flex items-center space-x-4">
             <div className="text-right">
               <div className="text-lg font-bold text-gray-900">
-                {formatCurrency(claim.claimedAmount)}
+                {formatCurrency ? formatCurrency(claimedAmount) : `$${claimedAmount}`}
               </div>
               <div className="text-sm text-gray-500">
                 {daysAgo === 0 ? 'Today' : `${daysAgo}d ago`}
@@ -187,12 +214,12 @@ export const ClaimCard = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="text-xl font-bold text-gray-900">{claim.claimNumber}</h3>
-                <span className="text-2xl" role="img" aria-label={claim.type}>
-                  {getClaimTypeIcon(claim.type)}
+                <h3 className="text-xl font-bold text-gray-900">{claimNumber}</h3>
+                <span className="text-2xl" role="img" aria-label={claimType}>
+                  {getClaimTypeIcon(claimType)}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 mt-1">{claim.type.replace('-', ' ').toUpperCase()}</p>
+              <p className="text-sm text-gray-600 mt-1">{claimType.replace('-', ' ').toUpperCase()}</p>
             </div>
           </div>
 
@@ -249,7 +276,7 @@ export const ClaimCard = ({
 
         {/* Description */}
         <p className="text-gray-700 mb-6 line-clamp-2">
-          {claim.description}
+          {description}
         </p>
 
         {/* Stats Grid */}
@@ -260,18 +287,18 @@ export const ClaimCard = ({
               <div className="text-sm text-gray-600">Claimed Amount</div>
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {formatCurrency(claim.claimedAmount)}
+              {formatCurrency ? formatCurrency(claimedAmount) : `$${claimedAmount}`}
             </div>
           </div>
 
-          {claim.approvedAmount && (
+          {approvedAmount && (
             <div className="bg-blue-50 rounded-lg p-4">
               <div className="flex items-center space-x-2 mb-2">
                 <CheckCircle className="text-blue-500" size={18} />
                 <div className="text-sm text-blue-600">Approved Amount</div>
               </div>
               <div className="text-2xl font-bold text-blue-700">
-                {formatCurrency(claim.approvedAmount)}
+                {formatCurrency ? formatCurrency(approvedAmount) : `$${approvedAmount}`}
               </div>
             </div>
           )}
@@ -282,7 +309,7 @@ export const ClaimCard = ({
               <div className="text-sm text-amber-600">Incident Date</div>
             </div>
             <div className="text-lg font-bold text-amber-700">
-              {formatDate(claim.incidentDate)}
+              {formatDate ? formatDate(incidentDate) : new Date(incidentDate).toLocaleDateString()}
             </div>
           </div>
 
@@ -306,7 +333,7 @@ export const ClaimCard = ({
               </div>
               <div>
                 <div className="text-sm font-medium text-gray-900">
-                  {claim.policy?.policyNumber || 'N/A'}
+                  {policyNumber}
                 </div>
                 <div className="text-xs text-gray-500">Policy Number</div>
               </div>
@@ -365,7 +392,7 @@ export const ClaimCard = ({
         </div>
 
         {/* Progress indicator for certain statuses */}
-        {(claim.status === 'under-review' || claim.status === 'documentation-required') && (
+        {(claimStatus === 'under-review' || claimStatus === 'documentation-required') && (
           <div className="mt-4 pt-4 border-t border-gray-100">
             <div className="flex items-center justify-between mb-2">
               <div className="text-sm font-medium text-gray-700">Progress</div>
@@ -374,10 +401,10 @@ export const ClaimCard = ({
             <div className="w-full bg-gray-200 rounded-full h-2">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: claim.status === 'under-review' ? '60%' : '30%' }}
+                animate={{ width: claimStatus === 'under-review' ? '60%' : '30%' }}
                 transition={{ duration: 1, delay: 0.2 }}
                 className={`h-2 rounded-full ${
-                  claim.status === 'under-review' ? 'bg-blue-500' : 'bg-amber-500'
+                  claimStatus === 'under-review' ? 'bg-blue-500' : 'bg-amber-500'
                 }`}
               />
             </div>

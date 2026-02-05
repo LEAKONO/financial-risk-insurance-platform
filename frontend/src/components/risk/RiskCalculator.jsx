@@ -55,43 +55,232 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
     coverageAmount: 100000
   });
 
-  const [premiumBreakdown, setPremiumBreakdown] = useState(null);
+  const [premiumBreakdown, setPremiumBreakdown] = useState({
+    basePremium: 0,
+    multiplier: 1,
+    finalPremium: 0,
+    appliedFactors: [],
+    calculation: ''
+  });
+  
   const [loading, setLoading] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     calculatePremium();
   }, [factors]);
 
+  const getBasePremium = () => {
+    const policy = policyTypes.find(p => p.value === factors.policyType);
+    return factors.coverageAmount * (policy?.baseRate || 0.015);
+  };
+
+  const calculateRiskMultiplier = () => {
+    let multiplier = 1.0;
+    
+    // Age factor
+    const ageGroup = ageGroups.find(g => g.value === factors.ageGroup);
+    if (ageGroup) multiplier *= ageGroup.risk;
+    
+    // Occupation factor
+    const occupation = occupationOptions.find(o => o.value === factors.occupation);
+    if (occupation) multiplier *= occupation.risk;
+    
+    // Health factors
+    if (factors.isSmoker) multiplier *= 1.8;
+    if (factors.hasChronicIllness) multiplier *= 1.5;
+    if (factors.hasDangerousHobbies) multiplier *= 1.4;
+    
+    // Location risk
+    const locationMultipliers = {
+      low: 0.9,
+      medium: 1.0,
+      high: 1.3
+    };
+    multiplier *= locationMultipliers[factors.locationRisk] || 1.0;
+    
+    // Credit score adjustment
+    if (factors.creditScore > 750) multiplier *= 0.9;
+    else if (factors.creditScore < 600) multiplier *= 1.2;
+    
+    // Income adjustment
+    if (factors.annualIncome > 100000) multiplier *= 0.95;
+    else if (factors.annualIncome < 30000) multiplier *= 1.1;
+    
+    return Number(multiplier.toFixed(2));
+  };
+  
+  const calculateFinalPremium = () => {
+    const basePremium = getBasePremium();
+    const multiplier = calculateRiskMultiplier();
+    return Number((basePremium * multiplier).toFixed(2));
+  };
+  
+  const getAppliedFactors = () => {
+    const factorsList = [];
+    
+    // Age factor
+    const ageGroup = ageGroups.find(g => g.value === factors.ageGroup);
+    if (ageGroup) {
+      factorsList.push({
+        description: `Age group: ${factors.ageGroup}`,
+        factor: 'age',
+        multiplier: ageGroup.risk
+      });
+    }
+    
+    // Occupation factor
+    const occupation = occupationOptions.find(o => o.value === factors.occupation);
+    if (occupation) {
+      factorsList.push({
+        description: `Occupation: ${occupation.label}`,
+        factor: 'occupation',
+        multiplier: occupation.risk
+      });
+    }
+    
+    // Health factors
+    if (factors.isSmoker) {
+      factorsList.push({
+        description: 'Smoker',
+        factor: 'smoker',
+        multiplier: 1.8
+      });
+    }
+    
+    if (factors.hasChronicIllness) {
+      factorsList.push({
+        description: 'Chronic illness',
+        factor: 'chronic_illness',
+        multiplier: 1.5
+      });
+    }
+    
+    if (factors.hasDangerousHobbies) {
+      factorsList.push({
+        description: 'Dangerous hobbies',
+        factor: 'hobbies',
+        multiplier: 1.4
+      });
+    }
+    
+    // Location risk
+    const locationMultipliers = {
+      low: 0.9,
+      medium: 1.0,
+      high: 1.3
+    };
+    factorsList.push({
+      description: `Location risk: ${factors.locationRisk}`,
+      factor: 'location',
+      multiplier: locationMultipliers[factors.locationRisk] || 1.0
+    });
+    
+    // Credit score adjustment
+    if (factors.creditScore > 750) {
+      factorsList.push({
+        description: 'Excellent credit score',
+        factor: 'credit',
+        multiplier: 0.9
+      });
+    } else if (factors.creditScore < 600) {
+      factorsList.push({
+        description: 'Poor credit score',
+        factor: 'credit',
+        multiplier: 1.2
+      });
+    }
+    
+    // Income adjustment
+    if (factors.annualIncome > 100000) {
+      factorsList.push({
+        description: 'High income',
+        factor: 'income',
+        multiplier: 0.95
+      });
+    } else if (factors.annualIncome < 30000) {
+      factorsList.push({
+        description: 'Low income',
+        factor: 'income',
+        multiplier: 1.1
+      });
+    }
+    
+    return factorsList;
+  };
+  
+  const generateCalculationString = () => {
+    const base = getBasePremium();
+    const multiplier = calculateRiskMultiplier();
+    const final = base * multiplier;
+    
+    return `Base Premium: $${base.toFixed(2)}
+Risk Multiplier: ${multiplier}x
+Final Premium: $${base.toFixed(2)} × ${multiplier} = $${final.toFixed(2)}`;
+  };
+
   const calculatePremium = async () => {
     try {
       setLoading(true);
-      const response = await riskService.simulatePremium({
+      setError(null);
+      
+      // Simulate a fallback calculation if API fails
+      const simulatedResponse = {
         basePremium: getBasePremium(),
-        factors: {
-          age: parseInt(factors.ageGroup.split('-')[0]) + 5,
-          occupation: factors.occupation,
-          isSmoker: factors.isSmoker,
-          hasChronicIllness: factors.hasChronicIllness,
-          annualIncome: factors.annualIncome,
-          creditScore: factors.creditScore,
-          hasDangerousHobbies: factors.hasDangerousHobbies,
-          locationRisk: factors.locationRisk
-        }
-      });
-
-      setPremiumBreakdown(response.data);
-      onPremiumCalculated?.(response.data);
+        multiplier: calculateRiskMultiplier(),
+        finalPremium: calculateFinalPremium(),
+        appliedFactors: getAppliedFactors(),
+        calculation: generateCalculationString()
+      };
+      
+      // Try API first, fallback to simulation
+      let response;
+      try {
+        response = await riskService.simulatePremium({
+          basePremium: getBasePremium(),
+          factors: {
+            age: parseInt(factors.ageGroup.split('-')[0]) + 5,
+            occupation: factors.occupation,
+            isSmoker: factors.isSmoker,
+            hasChronicIllness: factors.hasChronicIllness,
+            annualIncome: factors.annualIncome,
+            creditScore: factors.creditScore,
+            hasDangerousHobbies: factors.hasDangerousHobbies,
+            locationRisk: factors.locationRisk
+          }
+        });
+      } catch (apiError) {
+        console.warn('API failed, using simulated data:', apiError);
+        response = { data: simulatedResponse };
+      }
+      
+      // Ensure all required fields exist
+      const data = response.data || simulatedResponse;
+      const safeData = {
+        basePremium: data.basePremium || 0,
+        multiplier: data.multiplier || 1,
+        finalPremium: data.finalPremium || getBasePremium(),
+        appliedFactors: data.appliedFactors || [],
+        calculation: data.calculation || 'Calculation details not available'
+      };
+      
+      setPremiumBreakdown(safeData);
+      onPremiumCalculated?.(safeData);
     } catch (error) {
       console.error('Failed to calculate premium:', error);
+      setError('Failed to calculate premium. Using default values.');
+      // Set default values
+      setPremiumBreakdown({
+        basePremium: getBasePremium(),
+        multiplier: 1,
+        finalPremium: getBasePremium(),
+        appliedFactors: [],
+        calculation: 'Error in calculation'
+      });
     } finally {
       setLoading(false);
     }
-  };
-
-  const getBasePremium = () => {
-    const policy = policyTypes.find(p => p.value === factors.policyType);
-    return factors.coverageAmount * policy.baseRate;
   };
 
   const handleFactorChange = (key, value) => {
@@ -147,6 +336,15 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
           Calculate your insurance premium based on personal factors and risk profile
         </p>
       </div>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+            <AlertCircle className="w-5 h-5" />
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Input Factors */}
@@ -378,64 +576,60 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
                   <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2"></div>
                   <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mx-auto"></div>
                 </div>
-              ) : premiumBreakdown ? (
+              ) : (
                 <>
                   <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">
-                    {formatCurrency(premiumBreakdown.finalPremium)}
+                    {formatCurrency(premiumBreakdown?.finalPremium || 0)}
                   </div>
                   <div className="text-sm text-gray-600 dark:text-gray-400">
                     {factors.policyType === 'life' ? 'Annual Premium' : 'Monthly Premium'}
                   </div>
                 </>
-              ) : (
-                <div className="text-gray-500">Enter details to calculate</div>
               )}
             </div>
 
-            {premiumBreakdown && (
-              <div className="space-y-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Base Premium</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {formatCurrency(premiumBreakdown?.basePremium || 0)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600 dark:text-gray-400">Risk Multiplier</span>
+                <Badge className={
+                  (premiumBreakdown?.multiplier || 1) < 0.9 
+                    ? 'bg-green-100 text-green-800'
+                    : (premiumBreakdown?.multiplier || 1) < 1.3
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-red-100 text-red-800'
+                }>
+                  {(premiumBreakdown?.multiplier || 1).toFixed(2)}x
+                </Badge>
+              </div>
+
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Base Premium</span>
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {formatCurrency(premiumBreakdown.basePremium)}
+                  <span className="font-semibold text-gray-900 dark:text-white">Total</span>
+                  <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
+                    {formatCurrency(premiumBreakdown?.finalPremium || 0)}
                   </span>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Risk Multiplier</span>
-                  <Badge className={
-                    premiumBreakdown.multiplier < 0.9 
-                      ? 'bg-green-100 text-green-800'
-                      : premiumBreakdown.multiplier < 1.3
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }>
-                    {premiumBreakdown.multiplier.toFixed(2)}x
-                  </Badge>
-                </div>
-
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900 dark:text-white">Total</span>
-                    <span className="text-xl font-bold text-blue-600 dark:text-blue-400">
-                      {formatCurrency(premiumBreakdown.finalPremium)}
-                    </span>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => setShowDetails(!showDetails)}
-                  variant="outline"
-                  className="w-full"
-                >
-                  {showDetails ? 'Hide Details' : 'Show Calculation Details'}
-                </Button>
               </div>
-            )}
+
+              <Button
+                onClick={() => setShowDetails(!showDetails)}
+                variant="outline"
+                className="w-full"
+              >
+                {showDetails ? 'Hide Details' : 'Show Calculation Details'}
+              </Button>
+            </div>
           </Card>
 
           {/* Risk Factors Breakdown */}
-          {premiumBreakdown?.appliedFactors && (
+          {premiumBreakdown?.appliedFactors?.length > 0 && (
             <Card className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Applied Risk Factors
@@ -452,11 +646,11 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
                         {factor.description}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {factor.factor.replace('_', ' ')}
+                        {factor.factor?.replace('_', ' ') || 'Unknown factor'}
                       </p>
                     </div>
-                    <Badge className={getRiskColor(getRiskLevel(factor.multiplier))}>
-                      {factor.multiplier.toFixed(2)}x
+                    <Badge className={getRiskColor(getRiskLevel(factor.multiplier || 1))}>
+                      {(factor.multiplier || 1).toFixed(2)}x
                     </Badge>
                   </div>
                 ))}
@@ -466,14 +660,14 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-gray-900 dark:text-white">Overall Risk</span>
                   <Badge className={
-                    premiumBreakdown.multiplier < 0.9 
+                    (premiumBreakdown?.multiplier || 1) < 0.9 
                       ? 'bg-green-100 text-green-800'
-                      : premiumBreakdown.multiplier < 1.3
+                      : (premiumBreakdown?.multiplier || 1) < 1.3
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-red-100 text-red-800'
                   }>
-                    {premiumBreakdown.multiplier < 0.9 ? 'Low' :
-                     premiumBreakdown.multiplier < 1.3 ? 'Medium' : 'High'} Risk
+                    {(premiumBreakdown?.multiplier || 1) < 0.9 ? 'Low' :
+                     (premiumBreakdown?.multiplier || 1) < 1.3 ? 'Medium' : 'High'} Risk
                   </Badge>
                 </div>
               </div>
@@ -495,7 +689,7 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
       </div>
 
       {/* Calculation Details */}
-      {showDetails && premiumBreakdown && (
+      {showDetails && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -518,32 +712,32 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
 
             <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
               <code className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                {premiumBreakdown.calculation}
+                {premiumBreakdown?.calculation || 'No calculation details available'}
               </code>
             </div>
 
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg">
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {formatCurrency(premiumBreakdown.basePremium)}
+                  {formatCurrency(premiumBreakdown?.basePremium || 0)}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Base Premium</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg">
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {premiumBreakdown.multiplier.toFixed(2)}x
+                  {(premiumBreakdown?.multiplier || 1).toFixed(2)}x
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Risk Multiplier</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg">
                 <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                  {formatCurrency(premiumBreakdown.finalPremium - premiumBreakdown.basePremium)}
+                  {formatCurrency((premiumBreakdown?.finalPremium || 0) - (premiumBreakdown?.basePremium || 0))}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Risk Adjustment</div>
               </div>
               <div className="text-center p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg">
                 <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {formatCurrency(premiumBreakdown.finalPremium)}
+                  {formatCurrency(premiumBreakdown?.finalPremium || 0)}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">Final Premium</div>
               </div>
@@ -553,4 +747,6 @@ export const RiskCalculator = ({ onPremiumCalculated }) => {
       )}
     </motion.div>
   );
-};export default RiskCalculator;
+};
+
+export default RiskCalculator;
