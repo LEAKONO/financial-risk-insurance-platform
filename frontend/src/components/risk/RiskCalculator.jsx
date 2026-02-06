@@ -1,3 +1,4 @@
+// frontend/src/components/risk/RiskCalculator.jsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -6,7 +7,7 @@ import {
   Heart, Home, Car, Briefcase, User
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card/Card';
-import { Button } from '@/components/ui/Button/Button';
+import Button from '@/components/ui/Button/Button'; // ✅ Fixed: Changed from { Button } to Button
 import { Slider } from '@/components/ui/Form/Slider';
 import { Select } from '@/components/ui/Form/Select';
 import { Badge } from '@/components/ui/Badge/Badge';

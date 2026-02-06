@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   PlusIcon, 
@@ -19,81 +19,62 @@ import Modal from '../../../components/ui/Modal/Modal';
 import Button from '../../../components/ui/Button/Button';
 import Input from '../../../components/ui/Form/Input';
 import Select from '../../../components/ui/Form/Select';
+import { claimService } from '../../../services/api';
 
 const DashboardClaims = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // API STATE
+  const [claims, setClaims] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const claims = [
-    {
-      id: 1,
-      claimNumber: 'CLM-2024-001',
-      policyName: 'Life Insurance Premium',
-      amount: '$15,000',
-      status: 'approved',
-      date: '2024-01-15',
-      type: 'Medical',
-      description: 'Emergency hospitalization expenses',
-      documents: 3
-    },
-    {
-      id: 2,
-      claimNumber: 'CLM-2024-002',
-      policyName: 'Health Insurance Gold',
-      amount: '$5,000',
-      status: 'pending',
-      date: '2024-01-20',
-      type: 'Accident',
-      description: 'Car accident injury treatment',
-      documents: 2
-    },
-    {
-      id: 3,
-      claimNumber: 'CLM-2024-003',
-      policyName: 'Auto Insurance Comprehensive',
-      amount: '$3,500',
-      status: 'rejected',
-      date: '2024-01-25',
-      type: 'Collision',
-      description: 'Vehicle repair after collision',
-      documents: 4
-    },
-    {
-      id: 4,
-      claimNumber: 'CLM-2024-004',
-      policyName: 'Property Insurance',
-      amount: '$12,000',
-      status: 'processing',
-      date: '2024-01-30',
-      type: 'Property Damage',
-      description: 'Water damage restoration',
-      documents: 5
-    },
-    {
-      id: 5,
-      claimNumber: 'CLM-2024-005',
-      policyName: 'Travel Insurance',
-      amount: '$2,500',
-      status: 'approved',
-      date: '2024-02-01',
-      type: 'Trip Cancellation',
-      description: 'Flight cancellation due to illness',
-      documents: 2
-    },
-    {
-      id: 6,
-      claimNumber: 'CLM-2024-006',
-      policyName: 'Disability Insurance',
-      amount: '$8,000',
-      status: 'pending',
-      date: '2024-02-05',
-      type: 'Disability',
-      description: 'Temporary disability benefits',
-      documents: 3
+  // FETCH CLAIMS FROM API
+  useEffect(() => {
+    fetchClaims();
+  }, []);
+
+  const fetchClaims = async () => {
+    try {
+      setLoading(true);
+      const response = await claimService.getClaims();
+      
+      if (response.success) {
+        // Check if claims array exists in response
+        if (response.data && response.data.claims && Array.isArray(response.data.claims)) {
+          const transformedClaims = response.data.claims.map(claim => ({
+            id: claim._id,
+            claimNumber: claim.claimNumber,
+            policyName: claim.policy ? claim.policy.name : 'Unknown Policy',
+            amount: claim.claimAmount ? `$${claim.claimAmount}` : '$0',
+            status: claim.status,
+            date: claim.incidentDate 
+              ? new Date(claim.incidentDate).toISOString().split('T')[0]
+              : new Date().toISOString().split('T')[0],
+            type: claim.claimType,
+            description: claim.description,
+            documents: claim.documents ? claim.documents.length : 0
+          }));
+          
+          setClaims(transformedClaims);
+        } else {
+          // No claims in response
+          setClaims([]);
+        }
+      } else {
+        setError(response.message || 'Failed to load claims');
+      }
+    } catch (err) {
+      console.error('Error fetching claims:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
+  // Filter claims
   const filteredClaims = claims.filter(claim => {
     const matchesSearch = claim.claimNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          claim.policyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -125,36 +106,37 @@ const DashboardClaims = () => {
     }
   };
 
-  const stats = [
-    {
-      title: 'Total Claims',
-      value: '6',
-      change: '+2',
-      isPositive: true,
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      title: 'Approved Claims',
-      value: '2',
-      change: '+1',
-      isPositive: true,
-      color: 'from-emerald-500 to-green-500'
-    },
-    {
-      title: 'Pending Review',
-      value: '2',
-      change: '-1',
-      isPositive: false,
-      color: 'from-orange-500 to-yellow-500'
-    },
-    {
-      title: 'Total Claimed',
-      value: '$46,000',
-      change: '+18%',
-      isPositive: true,
-      color: 'from-purple-500 to-pink-500'
-    }
-  ];
+  // Calculate stats from actual data
+  const stats = {
+    total: claims.length,
+    approved: claims.filter(c => c.status === 'approved').length,
+    pending: claims.filter(c => c.status === 'pending').length,
+    totalClaimed: claims.reduce((sum, c) => sum + parseFloat(c.amount.replace(/[^0-9.-]+/g, '')), 0)
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading claims...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️ {error}</div>
+          <Button onClick={fetchClaims}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -185,33 +167,72 @@ const DashboardClaims = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
-          >
-            <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
-              {index === 0 && <ClockIcon className="w-6 h-6 text-white" />}
-              {index === 1 && <CheckCircleIcon className="w-6 h-6 text-white" />}
-              {index === 2 && <ExclamationTriangleIcon className="w-6 h-6 text-white" />}
-              {index === 3 && <DocumentArrowUpIcon className="w-6 h-6 text-white" />}
-            </div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-              {stat.value}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {stat.title}
-            </div>
-            <div className={`inline-flex items-center text-sm font-medium ${
-              stat.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            }`}>
-              {stat.isPositive ? '↗' : '↘'} {stat.change}
-            </div>
-          </motion.div>
-        ))}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
+            <ClockIcon className="w-6 h-6 text-white" />
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {stats.total}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Total Claims
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-500 flex items-center justify-center mb-4">
+            <CheckCircleIcon className="w-6 h-6 text-white" />
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {stats.approved}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Approved Claims
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center mb-4">
+            <ExclamationTriangleIcon className="w-6 h-6 text-white" />
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            {stats.pending}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Pending Review
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl"
+        >
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+            <DocumentArrowUpIcon className="w-6 h-6 text-white" />
+          </div>
+          <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+            ${stats.totalClaimed.toFixed(0)}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            Total Claimed
+          </div>
+        </motion.div>
       </div>
 
       {/* Filters & Search */}
@@ -315,7 +336,7 @@ const DashboardClaims = () => {
                     <div className="mt-4">
                       <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Description</div>
                       <p className="text-gray-700 dark:text-gray-300">
-                        {claim.description}
+                        {claim.description || 'No description provided'}
                       </p>
                     </div>
                   </div>
@@ -363,14 +384,26 @@ const DashboardClaims = () => {
             <FunnelIcon className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No claims found
+            {claims.length === 0
+              ? "You haven't filed any claims yet"
+              : "No claims match your search"
+            }
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Try adjusting your search or filter to find what you're looking for.
+            {claims.length === 0
+              ? "File a claim when you need to make an insurance claim"
+              : "Try adjusting your search or filter"
+            }
           </p>
-          <Button onClick={() => { setSearchTerm(''); setFilterStatus('all'); }}>
-            Clear filters
-          </Button>
+          {claims.length === 0 ? (
+            <Button onClick={() => setIsModalOpen(true)}>
+              File Your First Claim
+            </Button>
+          ) : (
+            <Button onClick={() => { setSearchTerm(''); setFilterStatus('all'); }}>
+              Clear filters
+            </Button>
+          )}
         </motion.div>
       )}
 
@@ -409,7 +442,10 @@ const DashboardClaims = () => {
         title="File New Claim"
         size="xl"
       >
-        <ClaimForm onSuccess={() => setIsModalOpen(false)} />
+        <ClaimForm onSuccess={() => {
+          setIsModalOpen(false);
+          fetchClaims();
+        }} />
       </Modal>
     </div>
   );

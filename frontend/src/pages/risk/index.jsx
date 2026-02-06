@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -11,75 +11,213 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   ArrowRightIcon,
-  BoltIcon,
-  UserIcon,
-  BuildingOfficeIcon,
-  HeartIcon,
-  CreditCardIcon,
-  MapPinIcon
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import RiskCalculator from '@/components/risk/RiskCalculator';
 import RiskScore from '@/components/risk/RiskScore';
-import RiskFactors from '@/components/risk/RiskFactors';
-import RiskSummary from '@/components/risk/RiskSummary';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { LineChart } from "@/components/charts/LineChart";
+import { riskService } from '@/services/api';
 
 const RiskAssessment = () => {
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
-  const [riskScore, setRiskScore] = useState(65);
-  const [riskProfile, setRiskProfile] = useState(null);
+  
+  // API STATE
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [riskData, setRiskData] = useState({
+    riskScore: 65,
+    riskFactors: [],
+    analysis: null,
+    comparison: null
+  });
 
-  const riskFactors = [
-    {
-      category: 'Personal',
-      factors: [
-        { name: 'Age', value: '35', impact: 'Medium', description: 'Prime age for insurance' },
-        { name: 'Occupation', value: 'Software Engineer', impact: 'Low', description: 'Low-risk profession' },
-        { name: 'BMI', value: '24.5', impact: 'Low', description: 'Healthy weight range' }
-      ]
-    },
-    {
-      category: 'Health',
-      factors: [
-        { name: 'Smoking', value: 'No', impact: 'Low', description: 'Non-smoker' },
-        { name: 'Chronic Illness', value: 'None', impact: 'Low', description: 'No known conditions' },
-        { name: 'Family History', value: 'Low Risk', impact: 'Medium', description: 'Minor genetic factors' }
-      ]
-    },
-    {
-      category: 'Lifestyle',
-      factors: [
-        { name: 'Exercise', value: 'Regular', impact: 'Low', description: 'Active lifestyle' },
-        { name: 'Hobbies', value: 'Low Risk', impact: 'Low', description: 'Safe recreational activities' },
-        { name: 'Travel', value: 'Occasional', impact: 'Medium', description: 'International travel 2x/year' }
-      ]
-    },
-    {
-      category: 'Financial',
-      factors: [
-        { name: 'Income', value: '$120,000', impact: 'Low', description: 'Stable high income' },
-        { name: 'Credit Score', value: '780', impact: 'Low', description: 'Excellent credit history' },
-        { name: 'Debt Ratio', value: '25%', impact: 'Medium', description: 'Manageable debt level' }
-      ]
+  // FETCH RISK DATA
+  useEffect(() => {
+    fetchRiskData();
+  }, []);
+
+  const fetchRiskData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Fetch risk profile and analysis
+      const [profileRes, analysisRes, comparisonRes] = await Promise.all([
+        riskService.getProfile(),
+        riskService.getAnalysis(),
+        riskService.compareWithAverage()
+      ]);
+      
+      if (profileRes.success) {
+        setRiskData({
+          riskScore: profileRes.data.riskScore || 65,
+          riskFactors: transformRiskFactors(profileRes.data),
+          analysis: analysisRes.success ? analysisRes.data : null,
+          comparison: comparisonRes.success ? comparisonRes.data : null
+        });
+      } else {
+        // If no risk profile, show empty state
+        setRiskData({
+          riskScore: 0,
+          riskFactors: [],
+          analysis: null,
+          comparison: null
+        });
+      }
+    } catch (err) {
+      console.error('Risk data fetch error:', err);
+      // Use default data if API fails
+      setRiskData({
+        riskScore: 65,
+        riskFactors: getDefaultRiskFactors(),
+        analysis: null,
+        comparison: null
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  // Transform Chart.js format to D3 LineChart format
+  // Transform API risk profile into risk factors
+  const transformRiskFactors = (profile) => {
+    if (!profile) return getDefaultRiskFactors();
+
+    return [
+      {
+        category: 'Personal',
+        factors: [
+          { 
+            name: 'Age', 
+            value: profile.age?.toString() || 'N/A', 
+            impact: getImpactLevel(profile.age, [18, 40, 55, 65]),
+            description: 'Current age'
+          },
+          { 
+            name: 'Occupation', 
+            value: profile.occupation || 'N/A', 
+            impact: 'Medium',
+            description: profile.occupationType || 'Occupation type'
+          },
+          { 
+            name: 'BMI', 
+            value: profile.bmi?.toFixed(1) || 'N/A', 
+            impact: getImpactLevel(profile.bmi, [18.5, 25, 30]),
+            description: 'Body mass index'
+          }
+        ]
+      },
+      {
+        category: 'Health',
+        factors: [
+          { 
+            name: 'Smoking', 
+            value: profile.smoker ? 'Yes' : 'No', 
+            impact: profile.smoker ? 'High' : 'Low',
+            description: 'Smoking status'
+          },
+          { 
+            name: 'Chronic Illness', 
+            value: profile.hasChronicIllness ? 'Yes' : 'None', 
+            impact: profile.hasChronicIllness ? 'High' : 'Low',
+            description: 'Chronic conditions'
+          },
+          { 
+            name: 'Family History', 
+            value: profile.familyHistory || 'Low Risk', 
+            impact: 'Medium',
+            description: 'Genetic factors'
+          }
+        ]
+      },
+      {
+        category: 'Lifestyle',
+        factors: [
+          { 
+            name: 'Exercise', 
+            value: profile.exerciseFrequency || 'Regular', 
+            impact: 'Low',
+            description: 'Physical activity'
+          },
+          { 
+            name: 'Hobbies', 
+            value: profile.hasHazardousHobbies ? 'High Risk' : 'Low Risk', 
+            impact: profile.hasHazardousHobbies ? 'High' : 'Low',
+            description: 'Recreational activities'
+          },
+          { 
+            name: 'Travel', 
+            value: profile.travelFrequency || 'Occasional', 
+            impact: 'Medium',
+            description: 'Travel frequency'
+          }
+        ]
+      },
+      {
+        category: 'Financial',
+        factors: [
+          { 
+            name: 'Income', 
+            value: profile.annualIncome ? `$${profile.annualIncome}` : 'N/A', 
+            impact: 'Low',
+            description: 'Annual income'
+          },
+          { 
+            name: 'Credit Score', 
+            value: profile.creditScore?.toString() || 'N/A', 
+            impact: getImpactLevel(profile.creditScore, [580, 670, 740]),
+            description: 'Credit history'
+          },
+          { 
+            name: 'Debt Ratio', 
+            value: profile.debtRatio ? `${profile.debtRatio}%` : 'N/A', 
+            impact: 'Medium',
+            description: 'Debt to income'
+          }
+        ]
+      }
+    ];
+  };
+
+  // Helper to get impact level based on value ranges
+  const getImpactLevel = (value, thresholds) => {
+    if (!value) return 'Medium';
+    if (value < thresholds[0]) return 'High';
+    if (value < thresholds[1]) return 'Low';
+    if (value < thresholds[2]) return 'Medium';
+    return 'High';
+  };
+
+  // Default risk factors if no profile exists
+  const getDefaultRiskFactors = () => {
+    return [
+      {
+        category: 'Personal',
+        factors: [
+          { name: 'Age', value: 'Not set', impact: 'Medium', description: 'Complete your profile' },
+          { name: 'Occupation', value: 'Not set', impact: 'Medium', description: 'Complete your profile' },
+          { name: 'BMI', value: 'Not set', impact: 'Medium', description: 'Complete your profile' }
+        ]
+      },
+      {
+        category: 'Health',
+        factors: [
+          { name: 'Smoking', value: 'Not set', impact: 'Medium', description: 'Complete your profile' },
+          { name: 'Chronic Illness', value: 'Not set', impact: 'Medium', description: 'Complete your profile' },
+          { name: 'Family History', value: 'Not set', impact: 'Medium', description: 'Complete your profile' }
+        ]
+      }
+    ];
+  };
+
   const riskHistoryData = [
     { date: 'Jan', value: 72 },
     { date: 'Feb', value: 70 },
     { date: 'Mar', value: 68 },
     { date: 'Apr', value: 67 },
     { date: 'May', value: 66 },
-    { date: 'Jun', value: 65 },
-    { date: 'Jul', value: 64 },
-    { date: 'Aug', value: 65 },
-    { date: 'Sep', value: 65 },
-    { date: 'Oct', value: 65 },
-    { date: 'Nov', value: 65 },
-    { date: 'Dec', value: 65 }
+    { date: 'Jun', value: riskData.riskScore },
   ];
 
   const recommendations = [
@@ -109,12 +247,16 @@ const RiskAssessment = () => {
     }
   ];
 
-  const handleCalculateRisk = (data) => {
-    // In a real app, this would call an API
-    const calculatedScore = Math.floor(Math.random() * 30) + 50; // Random score 50-80
-    setRiskScore(calculatedScore);
-    setRiskProfile(data);
-    setIsCalculatorOpen(false);
+  const handleCalculateRisk = async (data) => {
+    try {
+      const response = await riskService.createOrUpdateRiskProfile(data);
+      if (response.success) {
+        await fetchRiskData(); // Refresh data
+        setIsCalculatorOpen(false);
+      }
+    } catch (error) {
+      console.error('Error calculating risk:', error);
+    }
   };
 
   const getRiskCategory = (score) => {
@@ -125,7 +267,43 @@ const RiskAssessment = () => {
     return { label: 'Very High', color: 'from-red-500 to-rose-500' };
   };
 
-  const riskCategory = getRiskCategory(riskScore);
+  const riskCategory = getRiskCategory(riskData.riskScore);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading risk assessment...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // No profile state
+  if (riskData.riskScore === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-6">
+        <div className="text-center max-w-md">
+          <div className="text-6xl mb-4">📊</div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Complete Your Risk Profile
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            To view your personalized risk assessment, please complete your risk profile first.
+          </p>
+          <Button
+            onClick={() => setIsCalculatorOpen(true)}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          >
+            <CalculatorIcon className="w-5 h-5 mr-2" />
+            Complete Risk Profile
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -153,7 +331,7 @@ const RiskAssessment = () => {
             className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
           >
             <CalculatorIcon className="w-5 h-5" />
-            <span>Calculate Risk</span>
+            <span>Update Risk Profile</span>
           </Button>
         </div>
       </div>
@@ -172,7 +350,7 @@ const RiskAssessment = () => {
             </div>
             
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Your Risk Score: {riskScore}/100
+              Your Risk Score: {riskData.riskScore}/100
             </h2>
             
             <div className="flex items-center justify-center lg:justify-start space-x-4 mb-6">
@@ -180,7 +358,7 @@ const RiskAssessment = () => {
                 {riskCategory.label} Risk
               </div>
               <div className="text-blue-100">
-                {riskScore <= 50 ? 'Excellent' : riskScore <= 70 ? 'Good' : 'Needs Improvement'}
+                {riskData.riskScore <= 50 ? 'Excellent' : riskData.riskScore <= 70 ? 'Good' : 'Needs Improvement'}
               </div>
             </div>
             
@@ -191,10 +369,10 @@ const RiskAssessment = () => {
           </div>
           
           <div className="relative">
-            <RiskScore score={riskScore} size={200} />
+            <RiskScore score={riskData.riskScore} size={200} />
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <div className="text-4xl font-bold">{riskScore}</div>
+                <div className="text-4xl font-bold">{riskData.riskScore}</div>
                 <div className="text-sm text-blue-100">/100</div>
               </div>
             </div>
@@ -215,12 +393,12 @@ const RiskAssessment = () => {
               Risk Factors Breakdown
             </h3>
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              12 factors analyzed
+              {riskData.riskFactors.reduce((sum, cat) => sum + cat.factors.length, 0)} factors analyzed
             </div>
           </div>
           
           <div className="space-y-6">
-            {riskFactors.map((category, categoryIndex) => (
+            {riskData.riskFactors.map((category, categoryIndex) => (
               <div key={category.category}>
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
                   {category.category}
@@ -273,7 +451,7 @@ const RiskAssessment = () => {
               Risk Trend
             </h3>
             <div className="flex items-center space-x-2 text-sm">
-              {riskScore < 65 ? (
+              {riskData.riskScore < 65 ? (
                 <>
                   <ArrowTrendingDownIcon className="w-5 h-5 text-green-500" />
                   <span className="text-green-600 dark:text-green-400">Improving</span>
@@ -288,7 +466,6 @@ const RiskAssessment = () => {
           </div>
           
           <div className="h-64">
-            {/* Pass data in D3 format */}
             <LineChart 
               data={riskHistoryData}
               width={300}
@@ -310,12 +487,12 @@ const RiskAssessment = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Current Score</span>
-              <span className="font-semibold text-gray-900 dark:text-white">{riskScore}</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{riskData.riskScore}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-gray-600 dark:text-gray-400">Change</span>
-              <span className={`font-semibold ${riskScore < 72 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {riskScore < 72 ? '-' : '+'}{Math.abs(riskScore - 72)} points
+              <span className={`font-semibold ${riskData.riskScore < 72 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                {riskData.riskScore < 72 ? '-' : '+'}{Math.abs(riskData.riskScore - 72)} points
               </span>
             </div>
           </div>
@@ -414,28 +591,28 @@ const RiskAssessment = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span>Your Risk Score</span>
-              <span className="font-bold">{riskScore}</span>
+              <span className="font-bold">{riskData.riskScore}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Industry Average</span>
-              <span className="font-bold">58</span>
+              <span className="font-bold">{riskData.comparison?.average || 58}</span>
             </div>
             <div className="h-2 bg-white/30 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-white rounded-full"
-                style={{ width: `${(riskScore / 100) * 100}%` }}
+                style={{ width: `${(riskData.riskScore / 100) * 100}%` }}
               />
             </div>
             <div className="h-2 bg-white/30 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-emerald-200 rounded-full"
-                style={{ width: '58%' }}
+                style={{ width: `${(riskData.comparison?.average || 58)}%` }}
               />
             </div>
             <div className="flex items-center justify-between pt-4 border-t border-white/20">
               <span>Premium Impact</span>
-              <span className={`font-bold ${riskScore <= 58 ? 'text-emerald-200' : 'text-yellow-200'}`}>
-                {riskScore <= 58 ? '-12%' : '+8%'}
+              <span className={`font-bold ${riskData.riskScore <= 58 ? 'text-emerald-200' : 'text-yellow-200'}`}>
+                {riskData.riskScore <= 58 ? '-12%' : '+8%'}
               </span>
             </div>
           </div>

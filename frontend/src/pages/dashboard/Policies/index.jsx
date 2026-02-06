@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   PlusIcon, 
@@ -17,88 +17,70 @@ import Modal from '../../../components/ui/Modal/Modal';
 import Button from '../../../components/ui/Button/Button';
 import Input from '../../../components/ui/Form/Input';
 import Select from '../../../components/ui/Form/Select';
+import { policyService } from '../../../services/api';
 
 const DashboardPolicies = () => {
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'table'
+  const [viewMode, setViewMode] = useState('grid');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // API STATE
+  const [policies, setPolicies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const policies = [
-    {
-      id: 1,
-      name: 'Life Insurance Premium',
-      policyNumber: 'POL-2024-001',
-      premium: '$450/month',
-      status: 'active',
-      nextPayment: '2024-02-15',
-      coverage: '$500,000',
-      type: 'Life',
-      startDate: '2023-01-15',
-      endDate: '2043-01-15'
-    },
-    {
-      id: 2,
-      name: 'Health Insurance Gold',
-      policyNumber: 'POL-2024-002',
-      premium: '$320/month',
-      status: 'active',
-      nextPayment: '2024-02-20',
-      coverage: '$250,000',
-      type: 'Health',
-      startDate: '2023-02-01',
-      endDate: '2024-02-01'
-    },
-    {
-      id: 3,
-      name: 'Auto Insurance Comprehensive',
-      policyNumber: 'POL-2024-003',
-      premium: '$180/month',
-      status: 'pending',
-      nextPayment: '2024-02-25',
-      coverage: '$100,000',
-      type: 'Auto',
-      startDate: '2023-03-15',
-      endDate: '2024-03-15'
-    },
-    {
-      id: 4,
-      name: 'Property Insurance',
-      policyNumber: 'POL-2024-004',
-      premium: '$220/month',
-      status: 'expired',
-      nextPayment: 'N/A',
-      coverage: '$750,000',
-      type: 'Property',
-      startDate: '2022-01-01',
-      endDate: '2023-12-31'
-    },
-    {
-      id: 5,
-      name: 'Travel Insurance',
-      policyNumber: 'POL-2024-005',
-      premium: '$75/month',
-      status: 'cancelled',
-      nextPayment: 'N/A',
-      coverage: '$50,000',
-      type: 'Travel',
-      startDate: '2023-06-01',
-      endDate: '2024-06-01'
-    },
-    {
-      id: 6,
-      name: 'Disability Insurance',
-      policyNumber: 'POL-2024-006',
-      premium: '$150/month',
-      status: 'active',
-      nextPayment: '2024-03-01',
-      coverage: '$300,000',
-      type: 'Disability',
-      startDate: '2023-08-01',
-      endDate: '2033-08-01'
+  // FETCH POLICIES FROM API
+  useEffect(() => {
+    fetchPolicies();
+  }, []);
+
+  const fetchPolicies = async () => {
+    try {
+      setLoading(true);
+      const response = await policyService.getUserPolicies();
+      
+      if (response.success) {
+        // Check if policies array exists in response
+        if (response.data && response.data.policies && Array.isArray(response.data.policies)) {
+          const transformedPolicies = response.data.policies.map(policy => ({
+            id: policy._id,
+            name: policy.name,
+            policyNumber: policy.policyNumber,
+            premium: policy.totalPremium ? `$${policy.totalPremium}/month` : '$0/month',
+            status: policy.status,
+            nextPayment: policy.premiumSchedule && policy.premiumSchedule[0] && policy.premiumSchedule[0].dueDate 
+              ? new Date(policy.premiumSchedule[0].dueDate).toISOString().split('T')[0]
+              : 'N/A',
+            coverage: policy.coverage && policy.coverage[0] && policy.coverage[0].coverageAmount 
+              ? `$${policy.coverage[0].coverageAmount}` 
+              : '$0',
+            type: policy.coverage && policy.coverage[0] && policy.coverage[0].type,
+            startDate: policy.startDate 
+              ? new Date(policy.startDate).toISOString().split('T')[0]
+              : 'N/A',
+            endDate: policy.endDate 
+              ? new Date(policy.endDate).toISOString().split('T')[0]
+              : 'N/A'
+          }));
+          
+          setPolicies(transformedPolicies);
+        } else {
+          // No policies in response
+          setPolicies([]);
+        }
+      } else {
+        setError(response.message || 'Failed to load policies');
+      }
+    } catch (err) {
+      console.error('Error fetching policies:', err);
+      setError('Failed to connect to server');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
+  // Filter policies
   const filteredPolicies = policies.filter(policy => {
     const matchesSearch = policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          policy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase());
@@ -123,6 +105,41 @@ const DashboardPolicies = () => {
     { value: 'travel', label: 'Travel' },
     { value: 'disability', label: 'Disability' }
   ];
+
+  // Calculate stats from actual data
+  const stats = {
+    total: policies.length,
+    active: policies.filter(p => p.status === 'active').length,
+    monthlyPremium: policies
+      .filter(p => p.status === 'active')
+      .reduce((sum, p) => sum + parseFloat(p.premium.replace(/[^0-9.-]+/g, '')), 0),
+    totalCoverage: policies
+      .reduce((sum, p) => sum + parseFloat(p.coverage.replace(/[^0-9.-]+/g, '')), 0)
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading policies...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️ {error}</div>
+          <Button onClick={fetchPolicies}>Retry</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -284,7 +301,7 @@ const DashboardPolicies = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                          {policy.type}
+                          {policy.type || 'General'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-gray-900 dark:text-white font-medium">
@@ -298,7 +315,7 @@ const DashboardPolicies = () => {
                             ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}>
-                          {policy.status.charAt(0).toUpperCase() + policy.status.slice(1)}
+                          {policy.status ? policy.status.charAt(0).toUpperCase() + policy.status.slice(1) : 'Unknown'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
@@ -337,31 +354,43 @@ const DashboardPolicies = () => {
             <FunnelIcon className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-            No policies found
+            {policies.length === 0 
+              ? "You don't have any policies yet"
+              : "No policies match your search"
+            }
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Try adjusting your search or filter to find what you're looking for.
+            {policies.length === 0 
+              ? "Create your first policy to get started!"
+              : "Try adjusting your search or filter"
+            }
           </p>
-          <Button onClick={() => { setSearchTerm(''); setFilterStatus('all'); }}>
-            Clear filters
-          </Button>
+          {policies.length === 0 ? (
+            <Button onClick={() => setIsModalOpen(true)}>
+              Create Your First Policy
+            </Button>
+          ) : (
+            <Button onClick={() => { setSearchTerm(''); setFilterStatus('all'); }}>
+              Clear filters
+            </Button>
+          )}
         </motion.div>
       )}
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-6 text-white">
-          <div className="text-2xl font-bold mb-2">6</div>
+          <div className="text-2xl font-bold mb-2">{stats.total}</div>
           <div className="text-blue-100">Total Policies</div>
-          <div className="text-sm text-blue-200 mt-2">3 active policies</div>
+          <div className="text-sm text-blue-200 mt-2">{stats.active} active policies</div>
         </div>
         <div className="bg-gradient-to-r from-emerald-500 to-green-500 rounded-2xl p-6 text-white">
-          <div className="text-2xl font-bold mb-2">$1,395</div>
+          <div className="text-2xl font-bold mb-2">${stats.monthlyPremium.toFixed(0)}</div>
           <div className="text-emerald-100">Monthly Premium</div>
-          <div className="text-sm text-emerald-200 mt-2">$16,740 annually</div>
+          <div className="text-sm text-emerald-200 mt-2">${(stats.monthlyPremium * 12).toFixed(0)} annually</div>
         </div>
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-6 text-white">
-          <div className="text-2xl font-bold mb-2">$2.0M</div>
+          <div className="text-2xl font-bold mb-2">${(stats.totalCoverage / 1000000).toFixed(1)}M</div>
           <div className="text-purple-100">Total Coverage</div>
           <div className="text-sm text-purple-200 mt-2">Across all policies</div>
         </div>
@@ -374,7 +403,10 @@ const DashboardPolicies = () => {
         title="Create New Policy"
         size="lg"
       >
-        <PolicyForm onSuccess={() => setIsModalOpen(false)} />
+        <PolicyForm onSuccess={() => {
+          setIsModalOpen(false);
+          fetchPolicies();
+        }} />
       </Modal>
     </div>
   );

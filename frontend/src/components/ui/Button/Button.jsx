@@ -153,4 +153,6 @@ export const ButtonGroup = ({ children, className = '' }) => {
   );
 };
 
+// Export Button as both default and named export
 export default Button;
+export { Button };
