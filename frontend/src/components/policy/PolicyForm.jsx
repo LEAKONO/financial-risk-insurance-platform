@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -35,6 +35,7 @@ const premiumFrequencyOptions = [
 
 export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'create' }) => {
   const navigate = useNavigate();
+  const backdropRef = useRef(null);
   
   const [formData, setFormData] = useState({
     name: initialData.name || '',
@@ -51,6 +52,25 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Escape key handler
+  useEffect(() => {
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape' && !loading) {
+        handleCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [loading]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -100,6 +120,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
   };
 
   const handleCancel = () => {
+    console.log('Cancel clicked'); // Debug log
     // If onCancel callback is provided, use it
     if (onCancel) {
       onCancel();
@@ -110,13 +131,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
   };
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      handleCancel();
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape') {
+    if (e.target === backdropRef.current && !loading) {
       handleCancel();
     }
   };
@@ -168,19 +183,25 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
   return (
     <AnimatePresence>
       <motion.div
+        ref={backdropRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.2 }}
-        className="fixed inset-0 bg-gray-900/70 dark:bg-gray-900/80 backdrop-blur-sm z-50 overflow-y-auto"
+        className="policy-form-backdrop fixed inset-0 bg-gray-900/70 dark:bg-gray-900/80 backdrop-blur-sm z-50 overflow-y-auto"
         onClick={handleBackdropClick}
-        onKeyDown={handleKeyDown}
-        tabIndex={-1}
       >
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-          <div className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden my-8">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-6xl bg-white dark:bg-gray-800 rounded-xl shadow-2xl overflow-hidden my-8 relative z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header */}
-            <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <div className="flex-shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 relative z-10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
@@ -195,12 +216,12 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 relative z-20">
                   <button
                     type="button"
                     onClick={handleCancel}
                     disabled={loading}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors cursor-pointer"
                   >
                     <X className="w-4 h-4 sm:mr-2 inline" />
                     <span className="hidden sm:inline">Cancel</span>
@@ -209,7 +230,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                     type="button"
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors cursor-pointer"
                   >
                     {loading ? (
                       <div className="flex items-center">
@@ -631,7 +652,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                 </motion.form>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </AnimatePresence>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  PlusIcon, 
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  PlusIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
   TableCellsIcon,
@@ -9,23 +9,23 @@ import {
   ArrowDownTrayIcon,
   EyeIcon,
   PencilIcon,
-  TrashIcon
-} from '@heroicons/react/24/outline';
-import PolicyCard from '../../../components/policy/PolicyCard';
-import PolicyForm from '../../../components/policy/PolicyForm';
-import Modal from '../../../components/ui/Modal/Modal';
-import Button from '../../../components/ui/Button/Button';
-import Input from '../../../components/ui/Form/Input';
-import Select from '../../../components/ui/Form/Select';
-import { policyService } from '../../../services/api';
+  TrashIcon,
+} from "@heroicons/react/24/outline";
+import PolicyCard from "../../../components/policy/PolicyCard";
+import PolicyForm from "../../../components/policy/PolicyForm";
+import Modal from "../../../components/ui/Modal/Modal";
+import Button from "../../../components/ui/Button/Button";
+import Input from "../../../components/ui/Form/Input";
+import Select from "../../../components/ui/Form/Select";
+import { policyService } from "../../../services/api";
 
 const DashboardPolicies = () => {
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [filterType, setFilterType] = useState('all');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterType, setFilterType] = useState("all");
+
   // API STATE
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,92 +40,110 @@ const DashboardPolicies = () => {
     try {
       setLoading(true);
       const response = await policyService.getUserPolicies();
-      
+
       if (response.success) {
         // Check if policies array exists in response
-        if (response.data && response.data.policies && Array.isArray(response.data.policies)) {
-          const transformedPolicies = response.data.policies.map(policy => ({
+        if (
+          response.data &&
+          response.data.policies &&
+          Array.isArray(response.data.policies)
+        ) {
+          const transformedPolicies = response.data.policies.map((policy) => ({
             id: policy._id,
             name: policy.name,
             policyNumber: policy.policyNumber,
-            premium: policy.totalPremium ? `$${policy.totalPremium}/month` : '$0/month',
+            premium: policy.totalPremium
+              ? `$${policy.totalPremium}/month`
+              : "$0/month",
             status: policy.status,
-            nextPayment: policy.premiumSchedule && policy.premiumSchedule[0] && policy.premiumSchedule[0].dueDate 
-              ? new Date(policy.premiumSchedule[0].dueDate).toISOString().split('T')[0]
-              : 'N/A',
-            coverage: policy.coverage && policy.coverage[0] && policy.coverage[0].coverageAmount 
-              ? `$${policy.coverage[0].coverageAmount.toLocaleString()}` 
-              : '$0',
-            type: policy.coverage && policy.coverage[0] && policy.coverage[0].type,
-            startDate: policy.startDate 
-              ? new Date(policy.startDate).toISOString().split('T')[0]
-              : 'N/A',
-            endDate: policy.endDate 
-              ? new Date(policy.endDate).toISOString().split('T')[0]
-              : 'N/A'
+            nextPayment:
+              policy.premiumSchedule &&
+              policy.premiumSchedule[0] &&
+              policy.premiumSchedule[0].dueDate
+                ? new Date(policy.premiumSchedule[0].dueDate)
+                    .toISOString()
+                    .split("T")[0]
+                : "N/A",
+            coverage:
+              policy.coverage &&
+              policy.coverage[0] &&
+              policy.coverage[0].coverageAmount
+                ? `$${policy.coverage[0].coverageAmount.toLocaleString()}`
+                : "$0",
+            type:
+              policy.coverage && policy.coverage[0] && policy.coverage[0].type,
+            startDate: policy.startDate
+              ? new Date(policy.startDate).toISOString().split("T")[0]
+              : "N/A",
+            endDate: policy.endDate
+              ? new Date(policy.endDate).toISOString().split("T")[0]
+              : "N/A",
           }));
-          
+
           setPolicies(transformedPolicies);
         } else {
           // No policies in response
           setPolicies([]);
         }
       } else {
-        setError(response.message || 'Failed to load policies');
+        setError(response.message || "Failed to load policies");
       }
     } catch (err) {
-      console.error('Error fetching policies:', err);
-      setError('Failed to connect to server');
+      console.error("Error fetching policies:", err);
+      setError("Failed to connect to server");
     } finally {
       setLoading(false);
     }
   };
 
   // Filter policies
-  const filteredPolicies = policies.filter(policy => {
-    const matchesSearch = searchTerm === '' || 
+  const filteredPolicies = policies.filter((policy) => {
+    const matchesSearch =
+      searchTerm === "" ||
       policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       policy.policyNumber.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus === 'all' || policy.status === filterStatus;
-    const matchesType = filterType === 'all' || policy.type === filterType;
-    
+
+    const matchesStatus =
+      filterStatus === "all" || policy.status === filterStatus;
+    const matchesType = filterType === "all" || policy.type === filterType;
+
     return matchesSearch && matchesStatus && matchesType;
   });
 
   const statusOptions = [
-    { value: 'all', label: 'All Status' },
-    { value: 'active', label: 'Active' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'expired', label: 'Expired' },
-    { value: 'cancelled', label: 'Cancelled' }
+    { value: "all", label: "All Status" },
+    { value: "active", label: "Active" },
+    { value: "pending", label: "Pending" },
+    { value: "expired", label: "Expired" },
+    { value: "cancelled", label: "Cancelled" },
   ];
 
   const typeOptions = [
-    { value: 'all', label: 'All Types' },
-    { value: 'life', label: 'Life Insurance' },
-    { value: 'health', label: 'Health Insurance' },
-    { value: 'auto', label: 'Auto Insurance' },
-    { value: 'property', label: 'Property Insurance' },
-    { value: 'travel', label: 'Travel Insurance' },
-    { value: 'disability', label: 'Disability Insurance' }
+    { value: "all", label: "All Types" },
+    { value: "life", label: "Life Insurance" },
+    { value: "health", label: "Health Insurance" },
+    { value: "auto", label: "Auto Insurance" },
+    { value: "property", label: "Property Insurance" },
+    { value: "travel", label: "Travel Insurance" },
+    { value: "disability", label: "Disability Insurance" },
   ];
 
   // Calculate stats from actual data
   const stats = {
     total: policies.length,
-    active: policies.filter(p => p.status === 'active').length,
+    active: policies.filter((p) => p.status === "active").length,
     monthlyPremium: policies
-      .filter(p => p.status === 'active')
+      .filter((p) => p.status === "active")
       .reduce((sum, p) => {
-        const premiumValue = parseFloat(p.premium.replace(/[^0-9.-]+/g, '')) || 0;
+        const premiumValue =
+          parseFloat(p.premium.replace(/[^0-9.-]+/g, "")) || 0;
         return sum + premiumValue;
       }, 0),
-    totalCoverage: policies
-      .reduce((sum, p) => {
-        const coverageValue = parseFloat(p.coverage.replace(/[^0-9.-]+/g, '')) || 0;
-        return sum + coverageValue;
-      }, 0)
+    totalCoverage: policies.reduce((sum, p) => {
+      const coverageValue =
+        parseFloat(p.coverage.replace(/[^0-9.-]+/g, "")) || 0;
+      return sum + coverageValue;
+    }, 0),
   };
 
   // Loading state
@@ -134,7 +152,9 @@ const DashboardPolicies = () => {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading policies...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">
+            Loading policies...
+          </p>
         </div>
       </div>
     );
@@ -183,19 +203,37 @@ const DashboardPolicies = () => {
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
-          <div className="text-xl md:text-2xl font-bold mb-2">{stats.total}</div>
-          <div className="text-sm md:text-base text-blue-100">Total Policies</div>
-          <div className="text-xs md:text-sm text-blue-200 mt-2">{stats.active} active policies</div>
+          <div className="text-xl md:text-2xl font-bold mb-2">
+            {stats.total}
+          </div>
+          <div className="text-sm md:text-base text-blue-100">
+            Total Policies
+          </div>
+          <div className="text-xs md:text-sm text-blue-200 mt-2">
+            {stats.active} active policies
+          </div>
         </div>
         <div className="bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
-          <div className="text-xl md:text-2xl font-bold mb-2">${stats.monthlyPremium.toFixed(0)}</div>
-          <div className="text-sm md:text-base text-emerald-100">Monthly Premium</div>
-          <div className="text-xs md:text-sm text-emerald-200 mt-2">${(stats.monthlyPremium * 12).toFixed(0)} annually</div>
+          <div className="text-xl md:text-2xl font-bold mb-2">
+            ${stats.monthlyPremium.toFixed(0)}
+          </div>
+          <div className="text-sm md:text-base text-emerald-100">
+            Monthly Premium
+          </div>
+          <div className="text-xs md:text-sm text-emerald-200 mt-2">
+            ${(stats.monthlyPremium * 12).toFixed(0)} annually
+          </div>
         </div>
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl md:rounded-2xl p-4 md:p-6 text-white">
-          <div className="text-xl md:text-2xl font-bold mb-2">${(stats.totalCoverage / 1000000).toFixed(1)}M</div>
-          <div className="text-sm md:text-base text-purple-100">Total Coverage</div>
-          <div className="text-xs md:text-sm text-purple-200 mt-2">Across all policies</div>
+          <div className="text-xl md:text-2xl font-bold mb-2">
+            ${(stats.totalCoverage / 1000000).toFixed(1)}M
+          </div>
+          <div className="text-sm md:text-base text-purple-100">
+            Total Coverage
+          </div>
+          <div className="text-xs md:text-sm text-purple-200 mt-2">
+            Across all policies
+          </div>
         </div>
       </div>
 
@@ -229,7 +267,7 @@ const DashboardPolicies = () => {
                   className="w-full"
                 />
               </div>
-              
+
               {/* Type Filter */}
               <div className="w-full sm:w-auto flex-1 sm:flex-none">
                 <Select
@@ -239,16 +277,16 @@ const DashboardPolicies = () => {
                   className="w-full"
                 />
               </div>
-              
+
               {/* View Toggle */}
               <div className="w-full sm:w-auto">
                 <div className="flex items-center bg-gray-100 dark:bg-gray-700 p-1 rounded-lg h-full">
                   <button
-                    onClick={() => setViewMode('grid')}
+                    onClick={() => setViewMode("grid")}
                     className={`flex-1 sm:flex-none px-3 py-2 rounded-md transition-colors ${
-                      viewMode === 'grid'
-                        ? 'bg-white dark:bg-gray-600 shadow'
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                      viewMode === "grid"
+                        ? "bg-white dark:bg-gray-600 shadow"
+                        : "hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                     aria-label="Grid view"
                   >
@@ -258,11 +296,11 @@ const DashboardPolicies = () => {
                     </div>
                   </button>
                   <button
-                    onClick={() => setViewMode('table')}
+                    onClick={() => setViewMode("table")}
                     className={`flex-1 sm:flex-none px-3 py-2 rounded-md transition-colors ${
-                      viewMode === 'table'
-                        ? 'bg-white dark:bg-gray-600 shadow'
-                        : 'hover:bg-gray-200 dark:hover:bg-gray-600'
+                      viewMode === "table"
+                        ? "bg-white dark:bg-gray-600 shadow"
+                        : "hover:bg-gray-200 dark:hover:bg-gray-600"
                     }`}
                     aria-label="Table view"
                   >
@@ -277,12 +315,14 @@ const DashboardPolicies = () => {
 
             {/* Export Button - Right side */}
             <div className="w-full md:w-auto">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full md:w-auto flex items-center justify-center space-x-2 border-gray-300 dark:border-gray-600"
               >
                 <ArrowDownTrayIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="whitespace-nowrap text-sm sm:text-base">Export Data</span>
+                <span className="whitespace-nowrap text-sm sm:text-base">
+                  Export Data
+                </span>
               </Button>
             </div>
           </div>
@@ -291,7 +331,7 @@ const DashboardPolicies = () => {
 
       {/* Policies Grid/Table */}
       <AnimatePresence mode="wait">
-        {viewMode === 'grid' ? (
+        {viewMode === "grid" ? (
           <motion.div
             key="grid"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -346,7 +386,10 @@ const DashboardPolicies = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {filteredPolicies.map((policy) => (
-                        <tr key={policy.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                        <tr
+                          key={policy.id}
+                          className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors"
+                        >
                           <td className="px-4 md:px-6 py-3 md:py-4">
                             <div>
                               <div className="font-medium text-gray-900 dark:text-white text-sm md:text-base">
@@ -362,21 +405,26 @@ const DashboardPolicies = () => {
                           </td>
                           <td className="px-4 md:px-6 py-3 md:py-4">
                             <span className="inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                              {policy.type || 'General'}
+                              {policy.type || "General"}
                             </span>
                           </td>
                           <td className="px-4 md:px-6 py-3 md:py-4 text-gray-900 dark:text-white font-medium text-sm md:text-base">
                             {policy.premium}
                           </td>
                           <td className="px-4 md:px-6 py-3 md:py-4">
-                            <span className={`inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium ${
-                              policy.status === 'active'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : policy.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                            }`}>
-                              {policy.status ? policy.status.charAt(0).toUpperCase() + policy.status.slice(1) : 'Unknown'}
+                            <span
+                              className={`inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-medium ${
+                                policy.status === "active"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                  : policy.status === "pending"
+                                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                              }`}
+                            >
+                              {policy.status
+                                ? policy.status.charAt(0).toUpperCase() +
+                                  policy.status.slice(1)
+                                : "Unknown"}
                             </span>
                           </td>
                           <td className="px-4 md:px-6 py-3 md:py-4 text-gray-600 dark:text-gray-400 text-sm md:text-base">
@@ -384,19 +432,19 @@ const DashboardPolicies = () => {
                           </td>
                           <td className="px-4 md:px-6 py-3 md:py-4">
                             <div className="flex items-center space-x-1 md:space-x-2">
-                              <button 
+                              <button
                                 className="p-1 md:p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                                 title="View"
                               >
                                 <EyeIcon className="w-4 h-4 md:w-4 md:h-4" />
                               </button>
-                              <button 
+                              <button
                                 className="p-1 md:p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
                                 title="Edit"
                               >
                                 <PencilIcon className="w-4 h-4 md:w-4 md:h-4" />
                               </button>
-                              <button 
+                              <button
                                 className="p-1 md:p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                 title="Delete"
                               >
@@ -426,30 +474,28 @@ const DashboardPolicies = () => {
             <FunnelIcon className="w-8 h-8 md:w-12 md:h-12 text-gray-400" />
           </div>
           <h3 className="text-lg md:text-xl font-medium text-gray-900 dark:text-white mb-2">
-            {policies.length === 0 
+            {policies.length === 0
               ? "You don't have any policies yet"
-              : "No policies match your search"
-            }
+              : "No policies match your search"}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm md:text-base">
-            {policies.length === 0 
+            {policies.length === 0
               ? "Create your first policy to get started!"
-              : "Try adjusting your search or filter"
-            }
+              : "Try adjusting your search or filter"}
           </p>
           {policies.length === 0 ? (
-            <Button 
+            <Button
               onClick={() => setIsModalOpen(true)}
               className="w-full sm:w-auto"
             >
               Create Your First Policy
             </Button>
           ) : (
-            <Button 
-              onClick={() => { 
-                setSearchTerm(''); 
-                setFilterStatus('all'); 
-                setFilterType('all'); 
+            <Button
+              onClick={() => {
+                setSearchTerm("");
+                setFilterStatus("all");
+                setFilterType("all");
               }}
               className="w-full sm:w-auto"
             >
@@ -460,17 +506,19 @@ const DashboardPolicies = () => {
       )}
 
       {/* New Policy Modal */}
+      {/* New Policy Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Create New Policy"
         size="lg"
       >
-        <PolicyForm 
+        <PolicyForm
           onSuccess={() => {
             setIsModalOpen(false);
             fetchPolicies();
-          }} 
+          }}
+          onCancel={() => setIsModalOpen(false)}
         />
       </Modal>
     </div>

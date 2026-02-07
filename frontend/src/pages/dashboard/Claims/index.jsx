@@ -442,10 +442,13 @@ const DashboardClaims = () => {
         title="File New Claim"
         size="xl"
       >
-        <ClaimForm onSuccess={() => {
-          setIsModalOpen(false);
-          fetchClaims();
-        }} />
+        <ClaimForm 
+          onSuccess={() => {
+            setIsModalOpen(false);
+            fetchClaims();
+          }} 
+          onCancel={() => setIsModalOpen(false)} // ADD THIS LINE - This was missing!
+        />
       </Modal>
     </div>
   );
