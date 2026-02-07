@@ -1,6 +1,8 @@
 // frontend/src/App.jsx
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { ToastProvider } from './context/ToastContext'
@@ -31,71 +33,102 @@ import AdminClaims from './pages/admin/Claims'
 import AdminReports from './pages/admin/Reports'
 import AdminActivity from './pages/admin/Activity'
 
+// Create a React Query client with custom configuration
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, 
+      cacheTime: 1000 * 60 * 10, 
+      refetchOnWindowFocus: false, // Don't refetch when window regains focus
+      refetchOnMount: true, // Refetch when component mounts
+      refetchOnReconnect: true, // Refetch when reconnecting to network
+      retry: 1, // Retry failed requests once
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      onError: (error) => {
+        console.error('React Query Error:', error);
+      },
+    },
+    mutations: {
+      retry: 1,
+      onError: (error) => {
+        console.error('React Query Mutation Error:', error);
+      },
+    },
+  },
+});
+
 const App = () => {
   return (
     <ErrorBoundary>
-      <ThemeProvider>
-        <Router>
-          <AuthProvider>
-            <LoadingProvider>
-              <ToastProvider>
-                <ModalProvider>
-                  <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-                    <Routes>
-                      {/* Public Routes - MainLayout */}
-                      <Route path="/" element={<MainLayout />}>
-                        <Route index element={<Home />} />
-                        <Route path="risk-assessment" element={<RiskAssessment />} />
-                      </Route>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <Router>
+            <AuthProvider>
+              <LoadingProvider>
+                <ToastProvider>
+                  <ModalProvider>
+                    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+                      <Routes>
+                        {/* Public Routes - MainLayout */}
+                        <Route path="/" element={<MainLayout />}>
+                          <Route index element={<Home />} />
+                          <Route path="risk-assessment" element={<RiskAssessment />} />
+                        </Route>
 
-                      {/* Auth Routes - Standalone (no layout) */}
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/register" element={<Register />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
-                      <Route path="/reset-password/:token" element={<ResetPassword />} />
+                        {/* Auth Routes - Standalone (no layout) */}
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-                      {/* User Dashboard Routes - DashboardLayout */}
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <DashboardLayout />
-                          </ProtectedRoute>
-                        }
-                      >
-                        <Route index element={<DashboardOverview />} />
-                        <Route path="claims" element={<DashboardClaims />} />
-                        <Route path="policies" element={<DashboardPolicies />} />
-                        <Route path="profile" element={<DashboardProfile />} />
-                      </Route>
+                        {/* User Dashboard Routes - DashboardLayout */}
+                        <Route
+                          path="/dashboard"
+                          element={
+                            <ProtectedRoute>
+                              <DashboardLayout />
+                            </ProtectedRoute>
+                          }
+                        >
+                          <Route index element={<DashboardOverview />} />
+                          <Route path="claims" element={<DashboardClaims />} />
+                          <Route path="policies" element={<DashboardPolicies />} />
+                          <Route path="profile" element={<DashboardProfile />} />
+                        </Route>
 
-                      {/* Admin Routes - AdminLayout */}
-                      <Route
-                        path="/admin"
-                        element={
-                          <ProtectedRoute adminOnly={true}>
-                            <AdminLayout />
-                          </ProtectedRoute>
-                        }
-                      >
-                        <Route index element={<AdminDashboard />} />
-                        <Route path="users" element={<AdminUsers />} />
-                        <Route path="policies" element={<AdminPolicies />} />
-                        <Route path="claims" element={<AdminClaims />} />
-                        <Route path="reports" element={<AdminReports />} />
-                        <Route path="activity" element={<AdminActivity />} />
-                      </Route>
+                        {/* Admin Routes - AdminLayout */}
+                        <Route
+                          path="/admin"
+                          element={
+                            <ProtectedRoute adminOnly={true}>
+                              <AdminLayout />
+                            </ProtectedRoute>
+                          }
+                        >
+                          <Route index element={<AdminDashboard />} />
+                          <Route path="users" element={<AdminUsers />} />
+                          <Route path="policies" element={<AdminPolicies />} />
+                          <Route path="claims" element={<AdminClaims />} />
+                          <Route path="reports" element={<AdminReports />} />
+                          <Route path="activity" element={<AdminActivity />} />
+                        </Route>
 
-                      {/* 404 Route */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </div>
-                </ModalProvider>
-              </ToastProvider>
-            </LoadingProvider>
-          </AuthProvider>
-        </Router>
-      </ThemeProvider>
+                        {/* 404 Route */}
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </div>
+                  </ModalProvider>
+                </ToastProvider>
+              </LoadingProvider>
+            </AuthProvider>
+          </Router>
+        </ThemeProvider>
+        
+        {/* React Query Devtools - Only in development */}
+        {process.env.NODE_ENV === 'development' && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}
+      </QueryClientProvider>
     </ErrorBoundary>
   )
 }

@@ -89,6 +89,68 @@ const handleApiError = (error) => {
 };
 
 // ============================================
+// REQUEST DEDUPLICATION
+// ============================================
+const pendingRequests = new Map();
+
+const makeDeduplicatedRequest = async (key, requestFn) => {
+  // If request is already in progress, return the existing promise
+  if (pendingRequests.has(key)) {
+    console.log(`Deduplicating request: ${key}`);
+    return pendingRequests.get(key);
+  }
+
+  const requestPromise = requestFn()
+    .then(response => {
+      pendingRequests.delete(key);
+      return response;
+    })
+    .catch(error => {
+      pendingRequests.delete(key);
+      throw error;
+    });
+
+  pendingRequests.set(key, requestPromise);
+  return requestPromise;
+};
+
+// Helper function to create deduplicated API calls
+const createDeduplicatedApiCall = (endpoint, method = 'get', needsAuth = true) => {
+  return async (data, params = {}, config = {}) => {
+    const key = `${method}-${endpoint}-${JSON.stringify(params)}-${JSON.stringify(data)}`;
+    
+    const requestFn = () => {
+      const axiosConfig = {
+        ...config,
+        params,
+      };
+
+      switch (method.toLowerCase()) {
+        case 'get':
+          return apiClient.get(endpoint, axiosConfig);
+        case 'post':
+          return apiClient.post(endpoint, data, axiosConfig);
+        case 'put':
+          return apiClient.put(endpoint, data, axiosConfig);
+        case 'patch':
+          return apiClient.patch(endpoint, data, axiosConfig);
+        case 'delete':
+          return apiClient.delete(endpoint, { ...axiosConfig, data });
+        default:
+          throw new Error(`Unsupported HTTP method: ${method}`);
+      }
+    };
+
+    try {
+      const response = await makeDeduplicatedRequest(key, requestFn);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return handleApiError(error);
+    }
+  };
+};
+
+// ============================================
 // AUTH SERVICE
 // ============================================
 export const authService = {
@@ -306,27 +368,25 @@ export const riskService = {
 // CLAIM SERVICE
 // ============================================
 export const claimService = {
-  getClaims: async (params) => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.CLAIMS.LIST, { params });
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
+  // With deduplication for GET requests
+  getClaims: (params = {}) => 
+    makeDeduplicatedRequest(
+      `claims-${JSON.stringify(params)}`,
+      () => apiClient.get(API_ENDPOINTS.CLAIMS.LIST, { params })
+    ).then(response => ({ success: true, data: response.data }))
+     .catch(error => handleApiError(error)),
 
+  getClaim: (id) => 
+    makeDeduplicatedRequest(
+      `claim-${id}`,
+      () => apiClient.get(API_ENDPOINTS.CLAIMS.GET(id))
+    ).then(response => ({ success: true, data: response.data }))
+     .catch(error => handleApiError(error)),
+
+  // Without deduplication (mutations)
   createClaim: async (data) => {
     try {
       const response = await apiClient.post(API_ENDPOINTS.CLAIMS.CREATE, data);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  getClaim: async (id) => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.CLAIMS.GET(id));
       return { success: true, data: response.data };
     } catch (error) {
       return handleApiError(error);
@@ -400,42 +460,45 @@ export const claimService = {
       return handleApiError(error);
     }
   },
+
+  // Cache management
+  clearClaimsCache: () => {
+    Array.from(pendingRequests.keys())
+      .filter(key => key.startsWith('claims-') || key.startsWith('claim-'))
+      .forEach(key => pendingRequests.delete(key));
+  },
 };
 
 // ============================================
 // POLICY SERVICE
 // ============================================
 export const policyService = {
-  getPolicies: async (params) => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.POLICIES.LIST, { params });
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
+  // With deduplication for GET requests
+  getPolicies: (params = {}) => 
+    makeDeduplicatedRequest(
+      `policies-${JSON.stringify(params)}`,
+      () => apiClient.get(API_ENDPOINTS.POLICIES.LIST, { params })
+    ).then(response => ({ success: true, data: response.data }))
+     .catch(error => handleApiError(error)),
 
-  getUserPolicies: async (params = {}) => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.POLICIES.LIST, { params });
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
+  getUserPolicies: (params = {}) => 
+    makeDeduplicatedRequest(
+      `user-policies-${JSON.stringify(params)}`,
+      () => apiClient.get(API_ENDPOINTS.POLICIES.LIST, { params })
+    ).then(response => ({ success: true, data: response.data }))
+     .catch(error => handleApiError(error)),
 
+  getPolicy: (id) => 
+    makeDeduplicatedRequest(
+      `policy-${id}`,
+      () => apiClient.get(API_ENDPOINTS.POLICIES.GET(id))
+    ).then(response => ({ success: true, data: response.data }))
+     .catch(error => handleApiError(error)),
+
+  // Without deduplication (mutations)
   createPolicy: async (data) => {
     try {
       const response = await apiClient.post(API_ENDPOINTS.POLICIES.CREATE, data);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  getPolicy: async (id) => {
-    try {
-      const response = await apiClient.get(API_ENDPOINTS.POLICIES.GET(id));
       return { success: true, data: response.data };
     } catch (error) {
       return handleApiError(error);
@@ -503,6 +566,13 @@ export const policyService = {
     } catch (error) {
       return handleApiError(error);
     }
+  },
+
+  // Cache management
+  clearPoliciesCache: () => {
+    Array.from(pendingRequests.keys())
+      .filter(key => key.startsWith('policies-') || key.startsWith('policy-') || key.startsWith('user-policies-'))
+      .forEach(key => pendingRequests.delete(key));
   },
 };
 
@@ -797,6 +867,12 @@ export const adminService = {
   },
 };
 
+// Utility function to clear all caches
+export const clearAllCaches = () => {
+  pendingRequests.clear();
+  console.log('All API caches cleared');
+};
+
 // Export everything
 export default {
   api: apiClient,
@@ -809,4 +885,6 @@ export default {
   admin: adminService,
   activity: activityService,
   handleApiError,
+  clearAllCaches,
+  clearCache: clearAllCaches,
 };
