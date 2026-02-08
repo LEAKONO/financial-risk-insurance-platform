@@ -133,3 +133,59 @@
 {"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:40:27"}
 {"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:40:57"}
 {"level":"error","message":"Get recent activity controller error: Cannot read properties of undefined (reading 'getActivityActionLabel')","service":"financial-risk-insurance","timestamp":"2026-02-04 18:41:27"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:16"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:47:25"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 12:55:35"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk analysis error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk analysis controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Get risk profile error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Compare with average error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}
+{"level":"error","message":"Compare with average controller error: Risk profile not found","service":"financial-risk-insurance","timestamp":"2026-02-08 13:06:59"}

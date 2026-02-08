@@ -6,7 +6,7 @@ export const ROUTES = {
   REGISTER: '/register',
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password/:token',
-  RISK_ASSESSMENT: '/risk-assessment',
+  // REMOVED: RISK_ASSESSMENT: '/risk-assessment',
   
   // User dashboard
   DASHBOARD: '/dashboard',
@@ -14,6 +14,7 @@ export const ROUTES = {
   DASHBOARD_CLAIMS: '/dashboard/claims',
   DASHBOARD_POLICIES: '/dashboard/policies',
   DASHBOARD_PROFILE: '/dashboard/profile',
+  DASHBOARD_RISK: '/dashboard/risk', // ADDED
   
   // Admin routes
   ADMIN: '/admin',
@@ -23,4 +24,4 @@ export const ROUTES = {
   ADMIN_CLAIMS: '/admin/claims',
   ADMIN_REPORTS: '/admin/reports',
   ADMIN_ACTIVITY: '/admin/activity',
-}
+};

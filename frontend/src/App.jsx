@@ -25,7 +25,7 @@ import DashboardOverview from './pages/dashboard/Overview'
 import DashboardClaims from './pages/dashboard/Claims'
 import DashboardPolicies from './pages/dashboard/Policies'
 import DashboardProfile from './pages/dashboard/Profile'
-import RiskAssessment from './pages/risk'
+import DashboardRisk from "./pages/risk/index.jsx";
 import AdminDashboard from './pages/admin/Dashboard'
 import AdminUsers from './pages/admin/Users'
 import AdminPolicies from './pages/admin/Policies'
@@ -39,11 +39,11 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 1000 * 60 * 5, 
       cacheTime: 1000 * 60 * 10, 
-      refetchOnWindowFocus: false, // Don't refetch when window regains focus
-      refetchOnMount: true, // Refetch when component mounts
-      refetchOnReconnect: true, // Refetch when reconnecting to network
-      retry: 1, // Retry failed requests once
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+      refetchOnWindowFocus: false,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      retry: 1,
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
       onError: (error) => {
         console.error('React Query Error:', error);
       },
@@ -72,7 +72,8 @@ const App = () => {
                         {/* Public Routes - MainLayout */}
                         <Route path="/" element={<MainLayout />}>
                           <Route index element={<Home />} />
-                          <Route path="risk-assessment" element={<RiskAssessment />} />
+                          {/* Redirect risk-assessment to login */}
+                          <Route path="risk-assessment" element={<Navigate to="/login" replace />} />
                         </Route>
 
                         {/* Auth Routes - Standalone (no layout) */}
@@ -94,6 +95,7 @@ const App = () => {
                           <Route path="claims" element={<DashboardClaims />} />
                           <Route path="policies" element={<DashboardPolicies />} />
                           <Route path="profile" element={<DashboardProfile />} />
+                          <Route path="risk" element={<DashboardRisk />} /> {/* ADDED */}
                         </Route>
 
                         {/* Admin Routes - AdminLayout */}

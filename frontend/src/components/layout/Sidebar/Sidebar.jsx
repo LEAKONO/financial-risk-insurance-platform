@@ -1,3 +1,4 @@
+// frontend/src/components/layout/Sidebar/Sidebar.jsx
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,7 +13,8 @@ import {
   Cog6ToothIcon,
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
-  XMarkIcon
+  XMarkIcon,
+  ShieldCheckIcon // ADDED: Import ShieldCheckIcon for risk assessment
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../../hooks/useAuth';
 
@@ -26,6 +28,7 @@ const Sidebar = ({ isAdmin = false, isMobileOpen = false, onClose }) => {
     { path: '/dashboard', label: 'Dashboard', icon: HomeIcon },
     { path: '/dashboard/policies', label: 'My Policies', icon: DocumentTextIcon },
     { path: '/dashboard/claims', label: 'My Claims', icon: ClipboardDocumentListIcon },
+    { path: '/dashboard/risk', label: 'Risk Assessment', icon: ShieldCheckIcon }, // ADDED: Risk assessment menu item
     { path: '/dashboard/profile', label: 'Profile', icon: UserGroupIcon },
   ];
 
