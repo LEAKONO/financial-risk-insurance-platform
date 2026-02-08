@@ -14,7 +14,7 @@ export const ROUTES = {
   DASHBOARD_CLAIMS: '/dashboard/claims',
   DASHBOARD_POLICIES: '/dashboard/policies',
   DASHBOARD_PROFILE: '/dashboard/profile',
-  DASHBOARD_RISK: '/dashboard/risk', // ADDED
+  DASHBOARD_RISK: '/dashboard/risk',
   
   // Admin routes
   ADMIN: '/admin',

@@ -1,3 +1,4 @@
+// backend/routes/risk.routes.js
 const express = require('express');
 const router = express.Router();
 const riskController = require('../controllers/risk.controller');
@@ -16,13 +17,17 @@ router.post('/simulate-premium', riskController.simulatePremium);
 // Protected routes
 router.use(auth);
 
-// Risk profile routes
+// Risk profile routes - FIXED ENDPOINTS
 router.post('/profiles', validate(riskProfileValidator), riskController.createOrUpdateRiskProfile);
-router.get('/profiles/me', riskController.getRiskProfile);
-router.get('/profiles/analysis', riskController.getRiskAnalysis);
-router.get('/profiles/compare', riskController.compareWithAverage);
+router.get('/profiles/me', riskController.getRiskProfile);  // ✅ This exists
+router.get('/profiles/analysis', riskController.getRiskAnalysis);  // ✅ This exists
+router.get('/profiles/compare', riskController.compareWithAverage);  // ✅ This exists
 
-// Premium calculation
 router.post('/calculate-premium', validate(calculatePremiumValidator), riskController.calculatePremium);
+
+// Add these alias endpoints for compatibility
+router.get('/profile', riskController.getRiskProfile);  // Alias for /profiles/me
+router.get('/analysis', riskController.getRiskAnalysis);  // Alias for /profiles/analysis
+router.get('/compare', riskController.compareWithAverage);  // Alias for /profiles/compare
 
 module.exports = router;
