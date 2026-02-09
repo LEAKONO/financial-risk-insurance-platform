@@ -1,12 +1,53 @@
 const RiskService = require('../services/risk.service');
-const PremiumService = require('../services/premium.service');
 const { logger } = require('../utils/logger.util');
+
 class RiskController {
   /**
-   * Create or update risk profile
+   * Validate risk profile data
+   */
+  validateRiskData(data) {
+    const requiredFields = ['age', 'occupation', 'employmentStatus', 'annualIncome'];
+    const errors = [];
+    
+    requiredFields.forEach(field => {
+      if (!data[field] && data[field] !== 0) {
+        errors.push(`${field} is required`);
+      }
+    });
+    
+    // Validate age
+    if (data.age && (data.age < 18 || data.age > 100)) {
+      errors.push('Age must be between 18-100');
+    }
+    
+    // Validate income
+    if (data.annualIncome && data.annualIncome < 0) {
+      errors.push('Annual income cannot be negative');
+    }
+    
+    // Validate credit score
+    if (data.creditScore && (data.creditScore < 300 || data.creditScore > 850)) {
+      errors.push('Credit score must be between 300-850');
+    }
+    
+    return errors;
+  }
+
+  /**
+   * Create or update risk profile - UPDATED WITH VALIDATION
    */
   async createOrUpdateRiskProfile(req, res) {
     try {
+      // Validate data
+      const validationErrors = this.validateRiskData(req.body);
+      if (validationErrors.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Validation failed',
+          errors: validationErrors
+        });
+      }
+      
       const riskProfile = await RiskService.createOrUpdateRiskProfile(
         req.user._id,
         req.body

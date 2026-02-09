@@ -17,17 +17,17 @@ router.post('/simulate-premium', riskController.simulatePremium);
 // Protected routes
 router.use(auth);
 
-// Risk profile routes - FIXED ENDPOINTS
-router.post('/profiles', validate(riskProfileValidator), riskController.createOrUpdateRiskProfile);
-router.get('/profiles/me', riskController.getRiskProfile);  // ✅ This exists
-router.get('/profiles/analysis', riskController.getRiskAnalysis);  // ✅ This exists
-router.get('/profiles/compare', riskController.compareWithAverage);  // ✅ This exists
-
+// ⭐ MAIN ENDPOINTS (Use these)
+router.post('/profile', validate(riskProfileValidator), riskController.createOrUpdateRiskProfile);
+router.get('/profile', riskController.getRiskProfile);
+router.get('/analysis', riskController.getRiskAnalysis);
+router.get('/compare', riskController.compareWithAverage);
 router.post('/calculate-premium', validate(calculatePremiumValidator), riskController.calculatePremium);
 
-// Add these alias endpoints for compatibility
-router.get('/profile', riskController.getRiskProfile);  // Alias for /profiles/me
-router.get('/analysis', riskController.getRiskAnalysis);  // Alias for /profiles/analysis
-router.get('/compare', riskController.compareWithAverage);  // Alias for /profiles/compare
+// Legacy/compatibility endpoints (optional)
+router.post('/profiles', validate(riskProfileValidator), riskController.createOrUpdateRiskProfile); // Alias
+router.get('/profiles/me', riskController.getRiskProfile); // Alias
+router.get('/profiles/analysis', riskController.getRiskAnalysis); // Alias
+router.get('/profiles/compare', riskController.compareWithAverage); // Alias
 
 module.exports = router;

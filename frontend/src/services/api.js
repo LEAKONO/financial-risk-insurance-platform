@@ -297,23 +297,66 @@ export const userService = {
 };
 
 // ============================================
-// RISK SERVICE
+// RISK SERVICE - UPDATED VERSION
 // ============================================
 export const riskService = {
   getProfile: async () => {
     try {
       const response = await apiClient.get(API_ENDPOINTS.RISK.PROFILE);
-      return { success: true, data: response.data };
+      return { 
+        success: true, 
+        data: response.data,
+        exists: !!response.data?.data
+      };
     } catch (error) {
+      // If 404, no profile exists (normal for new users)
+      if (error.response?.status === 404) {
+        return { 
+          success: false, 
+          message: 'No risk profile found',
+          exists: false 
+        };
+      }
       return handleApiError(error);
     }
   },
 
   createOrUpdateProfile: async (data) => {
     try {
+      console.log('Sending risk data for profile creation/update:', data);
+      
+      // Validate required fields before sending
+      const requiredFields = ['age', 'occupation', 'employmentStatus', 'annualIncome'];
+      const missingFields = requiredFields.filter(field => !data[field] && data[field] !== 0);
+      
+      if (missingFields.length > 0) {
+        return {
+          success: false,
+          message: `Missing required fields: ${missingFields.join(', ')}`
+        };
+      }
+      
       const response = await apiClient.post(API_ENDPOINTS.RISK.CREATE_PROFILE, data);
-      return { success: true, data: response.data };
+      console.log('Risk profile response:', response.data);
+      
+      return { 
+        success: true, 
+        data: response.data,
+        message: response.data?.message || 'Risk profile saved successfully'
+      };
     } catch (error) {
+      console.error('Risk profile error:', error.response?.data || error);
+      
+      // Handle validation errors from backend
+      if (error.response?.status === 400 && error.response.data?.errors) {
+        return {
+          success: false,
+          message: 'Validation failed',
+          errors: error.response.data.errors,
+          validation: true
+        };
+      }
+      
       return handleApiError(error);
     }
   },
@@ -362,6 +405,54 @@ export const riskService = {
       return handleApiError(error);
     }
   },
+
+  // Helper method to check if profile is complete
+  isProfileComplete: (profileData) => {
+    if (!profileData) return false;
+    
+    const requiredFields = ['age', 'occupation', 'employmentStatus', 'annualIncome'];
+    return requiredFields.every(field => {
+      const value = profileData[field];
+      return value !== undefined && value !== null && value !== '';
+    });
+  },
+
+  // Validate data before sending to backend
+  validateData: (data) => {
+    const errors = [];
+    
+    if (!data.age || data.age < 18 || data.age > 100) {
+      errors.push('Age must be between 18-100');
+    }
+    
+    if (!data.occupation) {
+      errors.push('Occupation is required');
+    }
+    
+    if (!data.employmentStatus) {
+      errors.push('Employment status is required');
+    }
+    
+    if (!data.annualIncome || data.annualIncome < 0) {
+      errors.push('Valid annual income is required');
+    }
+    
+    if (data.creditScore && (data.creditScore < 300 || data.creditScore > 850)) {
+      errors.push('Credit score must be between 300-850');
+    }
+    
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  },
+
+  // Cache management
+  clearRiskCache: () => {
+    Array.from(pendingRequests.keys())
+      .filter(key => key.includes('risk'))
+      .forEach(key => pendingRequests.delete(key));
+  }
 };
 
 // ============================================
