@@ -7,6 +7,7 @@ import {
   DollarSign, Clock, Percent,
   AlertCircle, CheckCircle
 } from 'lucide-react';
+import { policyService } from '@/services/api'; // Import your API service
 
 const policyTypes = [
   { value: 'life', label: 'Life Insurance' },
@@ -52,6 +53,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState('');
 
   // Escape key handler
   useEffect(() => {
@@ -91,12 +93,24 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
       newErrors.startDate = 'Start date is required';
     }
 
+    // Validate beneficiaries percentages sum to 100
+    if (formData.beneficiaries && formData.beneficiaries.length > 0) {
+      const totalPercentage = formData.beneficiaries.reduce((sum, beneficiary) => {
+        return sum + (parseFloat(beneficiary.percentage) || 0);
+      }, 0);
+      
+      if (totalPercentage !== 100) {
+        newErrors.beneficiaries = 'Beneficiary percentages must total 100%';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError('');
     
     if (!validateForm()) {
       return;
@@ -105,27 +119,62 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
     try {
       setLoading(true);
       
+      // Transform form data to match backend expectations
+      const backendFormData = {
+        name: formData.name,
+        description: formData.description,
+        policyType: formData.policyType,
+        coverageAmount: parseFloat(formData.coverageAmount),
+        termLength: parseInt(formData.termLength),
+        premiumFrequency: formData.premiumFrequency,
+        startDate: formData.startDate,
+        isAutoRenewable: formData.isAutoRenewable,
+        // Convert beneficiaries to array of objects
+        beneficiaries: formData.beneficiaries.map(b => ({
+          name: b.name,
+          relationship: b.relationship,
+          percentage: parseFloat(b.percentage) || 0
+        }))
+      };
+
+      console.log('Sending policy data:', backendFormData);
+
       // If onSubmit callback is provided, use it
       if (onSubmit) {
-        await onSubmit(formData);
+        await onSubmit(backendFormData);
+      } else {
+        // Otherwise make direct API call
+        const result = await policyService.createPolicy(backendFormData);
+        
+        if (result.success) {
+          console.log('Policy created successfully:', result.data);
+          
+          // Show success message
+          // You could use a toast notification here
+          
+          // Navigate back to policies dashboard
+          navigate('/dashboard/policies');
+        } else {
+          throw new Error(result.message || 'Failed to create policy');
+        }
       }
       
-      // Navigate back to policies dashboard after successful submission
-      navigate('/dashboard/policies');
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error creating policy:', error);
+      setApiError(error.message || 'Failed to create policy. Please try again.');
+      
+      // Scroll to top to show error
+      window.scrollTo(0, 0);
     } finally {
       setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    console.log('Cancel clicked'); // Debug log
-    // If onCancel callback is provided, use it
+    console.log('Cancel clicked');
     if (onCancel) {
       onCancel();
     } else {
-      // Otherwise navigate back to policies dashboard
       navigate('/dashboard/policies');
     }
   };
@@ -141,6 +190,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
+    if (apiError) setApiError('');
   };
 
   const handleBeneficiaryChange = (index, field, value) => {
@@ -150,6 +200,10 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
       [field]: value
     };
     setFormData(prev => ({ ...prev, beneficiaries: updatedBeneficiaries }));
+    
+    if (errors.beneficiaries) {
+      setErrors(prev => ({ ...prev, beneficiaries: null }));
+    }
   };
 
   const addBeneficiary = () => {
@@ -179,6 +233,11 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
       documents: [...prev.documents, ...newDocs]
     }));
   };
+
+  // Calculate beneficiaries percentage total
+  const beneficiariesTotal = formData.beneficiaries.reduce((sum, b) => {
+    return sum + (parseFloat(b.percentage) || 0);
+  }, 0);
 
   return (
     <AnimatePresence>
@@ -251,10 +310,31 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
             {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto max-h-[calc(100vh-200px)]">
               <div className="p-6">
+                {/* API Error Message */}
+                {apiError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-red-800 dark:text-red-300 mb-1">
+                          Error
+                        </h4>
+                        <p className="text-sm text-red-700 dark:text-red-400">
+                          {apiError}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
                 <motion.form
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  onSubmit={(e) => e.preventDefault()} // Prevent default form submission
+                  onSubmit={(e) => e.preventDefault()}
                   className="space-y-6"
                 >
                   {/* Policy Details */}
@@ -357,7 +437,7 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                         </label>
                         <select
                           value={formData.termLength}
-                          onChange={(e) => handleInputChange('termLength', e.target.value)}
+                          onChange={(e) => handleInputChange('termLength', parseInt(e.target.value))}
                           className="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                         >
                           {termOptions.map(option => (
@@ -456,6 +536,27 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                       </button>
                     </div>
 
+                    {/* Beneficiaries Total Warning */}
+                    {beneficiariesTotal !== 100 && formData.beneficiaries.length > 0 && (
+                      <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                        <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-sm">
+                            Beneficiary percentages total {beneficiariesTotal}%. Must total 100%.
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {errors.beneficiaries && (
+                      <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                        <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                          <AlertCircle className="w-4 h-4" />
+                          <span className="text-sm">{errors.beneficiaries}</span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-4">
                       {formData.beneficiaries.map((beneficiary, index) => (
                         <div
@@ -527,77 +628,6 @@ export const PolicyForm = ({ initialData = {}, onSubmit, onCancel, mode = 'creat
                         </div>
                       ))}
                     </div>
-                  </div>
-
-                  {/* Documents */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
-                        <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                          Documents
-                        </h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Upload supporting documents
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors">
-                      <input
-                        type="file"
-                        multiple
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                        id="file-upload"
-                      />
-                      <label
-                        htmlFor="file-upload"
-                        className="cursor-pointer flex flex-col items-center"
-                      >
-                        <FileText className="w-12 h-12 text-gray-400 mb-3" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                          Click to upload or drag and drop
-                        </span>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          PDF, DOC, DOCX, JPG, PNG (max 10MB each)
-                        </span>
-                      </label>
-                    </div>
-
-                    {formData.documents.length > 0 && (
-                      <div className="mt-6 space-y-2">
-                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Uploaded Documents ({formData.documents.length})
-                        </h3>
-                        {formData.documents.map((doc, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded flex-shrink-0">
-                                <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                  {doc.name}
-                                </p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {doc.size ? `${(doc.size / 1024).toFixed(0)} KB` : 'Unknown size'}
-                                </p>
-                              </div>
-                            </div>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 ml-4 flex-shrink-0">
-                              {new Date(doc.uploadedAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Auto-renewal */}

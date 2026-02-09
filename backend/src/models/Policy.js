@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+// Beneficiary Schema
+const beneficiarySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  relationship: {
+    type: String,
+    enum: ['spouse', 'child', 'parent', 'sibling', 'other'],
+    default: 'other'
+  },
+  percentage: {
+    type: Number,
+    min: 0,
+    max: 100,
+    default: 0
+  }
+});
+
 const coverageSchema = new mongoose.Schema({
   type: {
     type: String,
@@ -61,6 +80,9 @@ const policySchema = new mongoose.Schema({
   },
   description: String,
   coverage: [coverageSchema],
+  
+  // Beneficiaries
+  beneficiaries: [beneficiarySchema],
   
   // Premium Information
   basePremium: {
@@ -135,6 +157,7 @@ policySchema.pre('save', async function() {
   console.log('isNew:', this.isNew);
   console.log('Current policyNumber:', this.policyNumber);
   console.log('Current name:', this.name);
+  console.log('Beneficiaries:', this.beneficiaries ? this.beneficiaries.length : 0);
   
   // Only generate for new documents
   if (!this.isNew) {
@@ -165,8 +188,37 @@ policySchema.pre('save', async function() {
     console.log('Set end date:', this.endDate);
   }
   
+  // Validate beneficiaries percentages if present
+  if (this.beneficiaries && this.beneficiaries.length > 0) {
+    const totalPercentage = this.beneficiaries.reduce((sum, beneficiary) => {
+      return sum + (beneficiary.percentage || 0);
+    }, 0);
+    
+    console.log('Beneficiaries total percentage:', totalPercentage);
+    
+    // Only validate for new policies or when beneficiaries are explicitly set
+    if (totalPercentage !== 100 && this.isModified('beneficiaries')) {
+      console.warn('Warning: Beneficiaries percentages total', totalPercentage, 'instead of 100');
+    }
+  }
+  
   console.log('=== PRE-SAVE HOOK END ===');
-  // No need to call next() in async functions
+});
+
+// Validate beneficiaries percentages (only on save)
+policySchema.pre('save', function(next) {
+  if (this.beneficiaries && this.beneficiaries.length > 0 && this.isModified('beneficiaries')) {
+    const totalPercentage = this.beneficiaries.reduce((sum, beneficiary) => {
+      return sum + (beneficiary.percentage || 0);
+    }, 0);
+    
+    if (totalPercentage !== 100) {
+      const err = new Error('Beneficiaries percentages must total 100%');
+      err.code = 'BENEFICIARY_PERCENTAGE_ERROR';
+      return next(err);
+    }
+  }
+  next();
 });
 
 // Indexes
@@ -174,5 +226,35 @@ policySchema.index({ policyNumber: 1 });
 policySchema.index({ user: 1 });
 policySchema.index({ status: 1 });
 policySchema.index({ startDate: 1, endDate: 1 });
+policySchema.index({ 'beneficiaries.name': 1 }); // Index for beneficiary search
+
+// Virtual for total beneficiaries percentage
+policySchema.virtual('totalBeneficiaryPercentage').get(function() {
+  if (!this.beneficiaries || this.beneficiaries.length === 0) {
+    return 0;
+  }
+  return this.beneficiaries.reduce((sum, beneficiary) => sum + (beneficiary.percentage || 0), 0);
+});
+
+// Method to add beneficiary
+policySchema.methods.addBeneficiary = function(beneficiary) {
+  this.beneficiaries.push(beneficiary);
+  return this.save();
+};
+
+// Method to remove beneficiary
+policySchema.methods.removeBeneficiary = function(beneficiaryId) {
+  this.beneficiaries = this.beneficiaries.filter(b => b._id.toString() !== beneficiaryId);
+  return this.save();
+};
+
+// Method to update beneficiary
+policySchema.methods.updateBeneficiary = function(beneficiaryId, updates) {
+  const beneficiary = this.beneficiaries.id(beneficiaryId);
+  if (beneficiary) {
+    Object.assign(beneficiary, updates);
+  }
+  return this.save();
+};
 
 module.exports = mongoose.model('Policy', policySchema);

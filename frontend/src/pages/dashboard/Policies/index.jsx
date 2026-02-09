@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 import {
   PlusIcon,
   FunnelIcon,
@@ -10,6 +11,9 @@ import {
   EyeIcon,
   PencilIcon,
   TrashIcon,
+  ShieldCheckIcon,
+  ExclamationTriangleIcon,
+  ArrowRightIcon,
 } from "@heroicons/react/24/outline";
 import PolicyCard from "../../../components/policy/PolicyCard";
 import PolicyForm from "../../../components/policy/PolicyForm";
@@ -17,24 +21,80 @@ import Modal from "../../../components/ui/Modal/Modal";
 import Button from "../../../components/ui/Button/Button";
 import Input from "../../../components/ui/Form/Input";
 import Select from "../../../components/ui/Form/Select";
-import { policyService } from "../../../services/api";
+import { policyService, riskService } from "../../../services/api";
 
 const DashboardPolicies = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("grid");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
+  
+  // Risk profile state
+  const [riskProfileStatus, setRiskProfileStatus] = useState({
+    exists: false,
+    isComplete: false,
+    loading: true,
+    error: null,
+  });
 
   // API STATE
   const [policies, setPolicies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // FETCH POLICIES FROM API
+  // Check risk profile on mount
   useEffect(() => {
+    checkRiskProfile();
     fetchPolicies();
   }, []);
+
+  // Check if user has a complete risk profile
+  const checkRiskProfile = async () => {
+    try {
+      setRiskProfileStatus(prev => ({ ...prev, loading: true }));
+      const response = await riskService.getProfile();
+      
+      if (response.success && response.data) {
+        // Check if profile is complete
+        const isComplete = response.data.isComplete || 
+                          (response.data.age && response.data.occupation && 
+                           response.data.annualIncome && response.data.employmentStatus);
+        
+        setRiskProfileStatus({
+          exists: true,
+          isComplete,
+          loading: false,
+          error: null,
+        });
+      } else {
+        setRiskProfileStatus({
+          exists: false,
+          isComplete: false,
+          loading: false,
+          error: response.message,
+        });
+      }
+    } catch (error) {
+      // 404 or 400 means no profile exists
+      if (error.response?.status === 404 || error.response?.status === 400) {
+        setRiskProfileStatus({
+          exists: false,
+          isComplete: false,
+          loading: false,
+          error: 'Risk profile not found',
+        });
+      } else {
+        setRiskProfileStatus({
+          exists: false,
+          isComplete: false,
+          loading: false,
+          error: error.message || 'Failed to check risk profile',
+        });
+      }
+    }
+  };
 
   const fetchPolicies = async () => {
     try {
@@ -96,6 +156,16 @@ const DashboardPolicies = () => {
     }
   };
 
+  // Handle create policy button click
+  const handleCreatePolicy = () => {
+    // Check if risk profile is complete
+    if (!riskProfileStatus.exists || !riskProfileStatus.isComplete) {
+      // Show the risk profile modal
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
   // Filter policies
   const filteredPolicies = policies.filter((policy) => {
     const matchesSearch =
@@ -147,13 +217,13 @@ const DashboardPolicies = () => {
   };
 
   // Loading state
-  if (loading) {
+  if (loading || riskProfileStatus.loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">
-            Loading policies...
+            Loading dashboard...
           </p>
         </div>
       </div>
@@ -174,30 +244,68 @@ const DashboardPolicies = () => {
 
   return (
     <div className="space-y-6 p-4 md:p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-            My Policies
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage and monitor all your insurance policies in one place
-          </p>
+      {/* Header with Risk Profile Warning */}
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              My Policies
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Manage and monitor all your insurance policies in one place
+            </p>
+          </div>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full md:w-auto"
+          >
+            <Button
+              onClick={handleCreatePolicy}
+              className="w-full md:w-auto flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              disabled={!riskProfileStatus.exists || !riskProfileStatus.isComplete}
+            >
+              <PlusIcon className="w-5 h-5" />
+              <span>New Policy</span>
+            </Button>
+          </motion.div>
         </div>
 
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full md:w-auto"
-        >
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="w-full md:w-auto flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+        {/* Risk Profile Warning Banner */}
+        {(!riskProfileStatus.exists || !riskProfileStatus.isComplete) && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg"
           >
-            <PlusIcon className="w-5 h-5" />
-            <span>New Policy</span>
-          </Button>
-        </motion.div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center">
+                  <ExclamationTriangleIcon className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Complete Your Risk Profile
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 mt-1">
+                  {!riskProfileStatus.exists 
+                    ? "You need to complete your risk assessment before creating policies."
+                    : "Your risk profile needs more information to calculate accurate premiums."}
+                </p>
+              </div>
+              <Button
+                onClick={() => navigate('/dashboard/risk')}
+                className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+              >
+                <ShieldCheckIcon className="w-4 h-4" />
+                {!riskProfileStatus.exists ? "Start Risk Assessment" : "Complete Profile"}
+                <ArrowRightIcon className="w-4 h-4" />
+              </Button>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Stats Summary */}
@@ -480,15 +588,20 @@ const DashboardPolicies = () => {
           </h3>
           <p className="text-gray-600 dark:text-gray-400 mb-6 text-sm md:text-base">
             {policies.length === 0
-              ? "Create your first policy to get started!"
+              ? riskProfileStatus.exists && riskProfileStatus.isComplete
+                ? "Create your first policy to get started!"
+                : "Complete your risk profile to create your first policy"
               : "Try adjusting your search or filter"}
           </p>
           {policies.length === 0 ? (
             <Button
-              onClick={() => setIsModalOpen(true)}
+              onClick={handleCreatePolicy}
               className="w-full sm:w-auto"
+              disabled={!riskProfileStatus.exists || !riskProfileStatus.isComplete}
             >
-              Create Your First Policy
+              {riskProfileStatus.exists && riskProfileStatus.isComplete
+                ? "Create Your First Policy"
+                : "Complete Risk Profile First"}
             </Button>
           ) : (
             <Button
@@ -505,7 +618,6 @@ const DashboardPolicies = () => {
         </motion.div>
       )}
 
-      {/* New Policy Modal */}
       {/* New Policy Modal */}
       <Modal
         isOpen={isModalOpen}
